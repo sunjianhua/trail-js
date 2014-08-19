@@ -1,0 +1,38 @@
+{
+  "name": "trail-js",
+  "version": "0.0.1",
+  "description": "A JavaScript navigation mesh pathfinding system.",
+  "main": "gulpfile.js",
+  "directories": {
+    "example": "examples"
+  },
+  "dependencies": {
+    "gulp": "^3.8.7",
+    "gulp-concat": "^2.3.4",
+    "gulp-filesize": "^0.0.6",
+    "gulp-rename": "^1.2.0",
+    "gulp-rimraf": "^0.1.0",
+    "gulp-uglify": "^0.3.1",
+    "gulp-util": "^3.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "build": "echo \"Build\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://antonmills@github.com/antonmills/trail-js.git"
+  },
+  "keywords": [
+    "pathfind",
+    "javascript",
+    "a*"
+  ],
+  "author": "Anton Mills",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/antonmills/trail-js/issues"
+  },
+  "homepage": "https://github.com/antonmills/trail-js"
+}
