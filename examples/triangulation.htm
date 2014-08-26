@@ -1,0 +1,86 @@
+<html>
+    <head>
+        <title>Trail - Examples</title>
+
+        <!-- app -->
+        <script type="text/javascript" src="js/trail.min.js"></script>
+
+        <!-- css linkage -->
+        <link rel="stylesheet" type="text/css" href="css/trail.css" />
+    </head>
+    <body>
+    <canvas id="canvas" width="640" height="480" style="border:1px solid">
+
+    <!-- on ready -->
+    <script type="text/javascript">
+        window.onload = function()
+        {
+            console.log("Document* Ready");
+
+
+
+
+            // --- canvas helpers ---
+
+            // canvas
+            var ctx = document.getElementById('canvas').getContext('2d');
+
+            // draw path
+            function drawPolygon(poly, drawPoints)
+            {
+                var vertices = poly.getVertices();
+
+
+                // draw poly
+                ctx.fillStyle = "rgba(255, 20, 10, 0.4)";
+                ctx.strokeStyle = '#ff0000';
+                ctx.beginPath();
+                ctx.moveTo(vertices[0].x, vertices[0].y);
+
+                for(var i = 1; i < vertices.length; i++)
+                {
+                    ctx.lineTo(vertices[i].x, vertices[i].y);
+                }
+
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+
+                // draw vertices
+                if(drawPoints)
+                {
+                    for(var i = 0; i < vertices.length; i++)
+                    {
+                        ctx.beginPath();
+                        ctx.arc(vertices[i].x, vertices[i].y, 2, 0, 2 * Math.PI, false);
+                        ctx.fillStyle = "rgba(0, 0, 255, 1)";
+                        ctx.closePath();
+                        ctx.fill();
+                    }
+                }
+            }
+
+            // -----------
+
+
+
+
+
+
+
+            // init app
+            TRAIL.sayHi();
+
+            // create a poly
+            var polygon1 = new TRAIL.Polygon([10,10, 60,10, 60,60, 10,60]);
+            var polygon2 = new TRAIL.Polygon([151,40, 180,40, 20,120, 151,150]);
+
+            // render
+            drawPolygon(polygon1, true);
+            drawPolygon(polygon2, true);
+
+            console.log(polygon2.isSimple());
+        }
+    </script>
+    </body>
+</html>

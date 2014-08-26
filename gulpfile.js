@@ -9,7 +9,8 @@ var gutil = require('gulp-util');
 var clean = require('gulp-rimraf');
 var connect = require('gulp-connect');
 var watch = require('gulp-watch');
-var livereload = require('gulp-livereload');
+var beautify = require('gulp-beautify');
+
 
 // clean dist folder
 gulp.task('clean-dist', function () {
@@ -17,11 +18,20 @@ gulp.task('clean-dist', function () {
         .pipe(clean());
 });
 
+
 // main build script
 gulp.task('build-js', function() {
-    return gulp.src('src/*.js')
+    console.log("Building Trail.js");
+
+    return gulp.src([
+        './src/intro.js',   // intro js
+        './src/trail.js',   // main trail class
+        './src/*/*.js',     // all other classes
+        './src/outro.js',   // outro js
+    ])
         // concatenate and generate trail.js
         .pipe(concat('trail.js'))
+        .pipe(beautify({indentSize: 4}))
         .pipe(gulp.dest('dist'))
         .pipe(filesize())
 
@@ -46,13 +56,10 @@ gulp.task('server-examples', function() {
     });
 });
 
-// file watcher for auto-build and examples reload
+// file watcher for auto-build
 gulp.task('watch', function () {
-    gulp.watch('./src/*.*', ['reload']);
+    gulp.watch('./src/**/*', ['clean-dist', 'build-js']);
 });
 
-
 // default gulp task
-gulp.task('default', ['server-examples']);
-gulp.task('dev', ['clean-dist', 'build-js', 'watch']);
-gulp.task('build', ['clean-dist', 'build-js']);
+gulp.task('default', ['clean-dist', 'build-js', 'server-examples', 'watch']);
