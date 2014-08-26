@@ -63,3 +63,4 @@ gulp.task('watch', function () {
 
 // default gulp task
 gulp.task('default', ['clean-dist', 'build-js', 'server-examples', 'watch']);
+gulp.task('examples', ['clean-dist', 'build-js', 'server-examples']);
