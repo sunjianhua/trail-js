@@ -9,8 +9,9 @@
         <link rel="stylesheet" type="text/css" href="css/trail.css" />
     </head>
     <body>
-    <h1>Trail.js Examples - Shape Test</h1>
-    <p>Testing shapes for simplicity of triangulation and convex/cancave. Results shown in Console.</p>
+    <h1>Trail.js Examples</h1>
+    <h2>Shape Test</h2>
+    <p><b>Overview</b><br />Testing shapes for simplicity of triangulation and convex/cancave. Results shown in Console.</p>
     <p><a href="/">... back to examples</a></p>
     <canvas id="canvas" width="640" height="480" style="border:1px solid">
 
@@ -75,9 +76,9 @@
             TRAIL.sayHi();
 
             // create a poly
-            var polygon1 = new TRAIL.Polygon([10,10, 60,10, 60,60, 10,60]);
-            var polygon2 = new TRAIL.Polygon([151,40, 180,40, 20,120, 151,150]);
-            var polygon3 = new TRAIL.Polygon([251,80, 320,86, 328,160, 428,120, 191,120, 193, 10, 291,100, 291,60, 391,30, 171,20]);
+            var polygon1 = new TRAIL.Polygon([30,30, 90,30, 90,90, 30,90]);
+            var polygon2 = new TRAIL.Polygon([281,40, 310,40, 150,120, 301,150]);
+            var polygon3 = new TRAIL.Polygon([450,40, 550,70, 400,140, 400,120, 500,100]);
 
             // render
             drawPolygon(polygon1, true);
@@ -90,7 +91,7 @@
             console.log("polygon2 isSimple(): " + polygon2.isSimple());
             console.log("polygon3 isSimple(): " + polygon3.isSimple());
 
-            console.log("\n\n");
+            console.log("\n");
 
             // testing convex or cancave shape
             console.log("%c Polygon Shape Tests* ", "background: #000000; color: #ffffff");

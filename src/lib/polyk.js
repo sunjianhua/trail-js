@@ -39,6 +39,7 @@ PolyK.IsSimple = function (p)
 {
 	var n = p.length >> 1;
 	if (n < 4) return true;
+	console.log("here");
 
 	var a1 = new PolyK._P(), a2 = new PolyK._P();
 	var b1 = new PolyK._P(), b2 = new PolyK._P();

@@ -2,10 +2,15 @@ body
 {
     background-color: 	#ccc;
     margin: 			0px;
-    padding: 			0px;
+    padding: 			15px;
     color:              #333;
 }
 
 a:link 		{color: #ff1234; text-decoration: underline;}
 a:visited 	{color: #ff1234; text-decoration: underline;}
 a:active 	{color: #ff1234; text-decoration: underline;}
+
+canvas
+{
+    margin-top: 40px;
+}

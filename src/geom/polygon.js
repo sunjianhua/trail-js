@@ -35,11 +35,16 @@ TRAIL.Polygon.prototype.getVertices = function()
  */
 TRAIL.Polygon.prototype.isSimple = function()
 {
-	// TODO pass over to PolyK for the isSimple
+	// TODO PolyK - this is returning incorrectly
 	return PolyK.IsSimple(this.vertices);
 };
 
 
+/**
+ * Tests if a Polygon shape is convex
+ *
+ * @return {Boolean} true is a convex shape
+ */
 TRAIL.Polygon.prototype.isConvex = function()
 {
 	if (this.vertices.length < 4)
@@ -54,7 +59,7 @@ TRAIL.Polygon.prototype.isConvex = function()
 		var dx2 = this.vertices[i].x - this.vertices[(i + 1) % n].x;
 		var dy2 = this.vertices[i].y - this.vertices[(i + 1) % n].y;
 		var zcrossproduct = dx1 * dy2 - dy1 * dx2;
-		if (i == 0)
+		if(i == 0)
 		{
 			sign = zcrossproduct > 0;
 		} else
@@ -64,6 +69,9 @@ TRAIL.Polygon.prototype.isConvex = function()
 		}
 	}
 	return true;
+
+	// TODO PolyK - why does this return incorrect?
+	//return PolyK.IsConvex(this.vertices);
 }
 
 

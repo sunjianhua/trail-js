@@ -14,7 +14,7 @@
 
     // debug output
     TRAIL.sayHi = function () {
-        console.log('%c trail* init \n', 'background: #ff1234; color: #ffffff');
+        console.log('%c trail.js* init \n', 'background: #ff1234; color: #ffffff');
     }
     /**
      * This class is a point implementation
@@ -65,11 +65,16 @@
      * @return {Boolean} true is a simple Polygon
      */
     TRAIL.Polygon.prototype.isSimple = function () {
-        // TODO pass over to PolyK for the isSimple
+        // TODO PolyK - this is returning incorrectly
         return PolyK.IsSimple(this.vertices);
     };
 
 
+    /**
+     * Tests if a Polygon shape is convex
+     *
+     * @return {Boolean} true is a convex shape
+     */
     TRAIL.Polygon.prototype.isConvex = function () {
         if (this.vertices.length < 4) return true;
 
@@ -88,6 +93,9 @@
             }
         }
         return true;
+
+        // TODO PolyK - why does this return incorrect?
+        //return PolyK.IsConvex(this.vertices);
     }
 
 
@@ -133,6 +141,7 @@
     PolyK.IsSimple = function (p) {
         var n = p.length >> 1;
         if (n < 4) return true;
+        console.log("here");
 
         var a1 = new PolyK._P(),
             a2 = new PolyK._P();
