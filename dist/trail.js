@@ -65,8 +65,8 @@
      * @return {Boolean} true is a simple Polygon
      */
     TRAIL.Polygon.prototype.isSimple = function () {
-        // TODO PolyK - this is returning incorrectly
-        return PolyK.IsSimple(this.vertices);
+        var vertices = TRAIL.verticesFromPolygon(this);
+        return PolyK.IsSimple(vertices);
     };
 
 
@@ -76,26 +76,31 @@
      * @return {Boolean} true is a convex shape
      */
     TRAIL.Polygon.prototype.isConvex = function () {
-        if (this.vertices.length < 4) return true;
+        var vertices = TRAIL.verticesFromPolygon(this);
+        return PolyK.IsConvex(vertices);
+    }
 
-        var sign = false;
-        var n = this.vertices.length;
-        for (var i = 0; i < n; i++) {
-            var dx1 = this.vertices[(i + 2) % n].x - this.vertices[(i + 1) % n].x;
-            var dy1 = this.vertices[(i + 2) % n].y - this.vertices[(i + 1) % n].y;
-            var dx2 = this.vertices[i].x - this.vertices[(i + 1) % n].x;
-            var dy2 = this.vertices[i].y - this.vertices[(i + 1) % n].y;
-            var zcrossproduct = dx1 * dy2 - dy1 * dx2;
-            if (i == 0) {
-                sign = zcrossproduct > 0;
-            } else {
-                if (sign != (zcrossproduct > 0)) return false;
-            }
+
+    /**
+     * Triangulates a Polygon
+     *
+     * @return {Array} returns an array of Polygons
+     */
+    TRAIL.Polygon.prototype.triangulate = function () {
+        var vertices = TRAIL.verticesFromPolygon(this);
+        var polykReturnValues = PolyK.Triangulate(vertices);
+        console.log("return: " + polykReturnValues);
+        // iterate over triangle data, creating polys for use
+        var triangles = [];
+        for (var i = 0; i < polykReturnValues.length; i++) {
+            console.log(vertices[polykReturnValues[i]], vertices[polykReturnValues[i + 1]], vertices[polykReturnValues[i + 2]], vertices[polykReturnValues[i + 3]], vertices[polykReturnValues[i + 4]], vertices[polykReturnValues[i + 5]])
+
+            var polygon = new TRAIL.Polygon([
+            vertices[polykReturnValues[i]], vertices[polykReturnValues[i + 1]], vertices[polykReturnValues[i + 2]], vertices[polykReturnValues[i + 3]], vertices[polykReturnValues[i + 4]], vertices[polykReturnValues[i + 5]]]);
+            triangles.push(polygon);
         }
-        return true;
 
-        // TODO PolyK - why does this return incorrect?
-        //return PolyK.IsConvex(this.vertices);
+        return triangles;
     }
 
 
@@ -141,7 +146,7 @@
     PolyK.IsSimple = function (p) {
         var n = p.length >> 1;
         if (n < 4) return true;
-        console.log("here");
+
 
         var a1 = new PolyK._P(),
             a2 = new PolyK._P();
@@ -230,6 +235,7 @@
 
 
     PolyK.Triangulate = function (p) {
+        //console.dir(p)
         var n = p.length >> 1;
         if (n < 3) return [];
         var tgs = [];
@@ -636,6 +642,52 @@
 
     PolyK._tp = [];
     for (var i = 0; i < 10; i++) PolyK._tp.push(new PolyK._P(0, 0));
+
+    /**
+     * Return vertices in a single Array.
+     * Used mostly for interactions between PolyK which requires an
+     * Array of vertices in a single linear stream.
+     *
+     * This method will return an Array such as: [x,y, x,y, x,y, x,y]
+     * e.g. [0,0, 10,0, 10,10, 0,10]
+     *
+     *
+     * @return {Array} returns an array of all vertices in [x,y,x,y] format
+     */
+    TRAIL.verticesFromPolygon = function (polygon) {
+        var vertices = polygon.getVertices();
+        var returnArray = [];
+        for (var i = 0; i < vertices.length; i++) {
+            var vertex = vertices[i];
+            returnArray.push(vertex.x, vertex.y);
+        }
+
+        return returnArray;
+    };
+
+
+    /**
+     * Return triangles from a single Array of vertices.
+     * Used mostly for interactions between PolyK which requires an
+     * Array of vertices in a single linear stream.
+     *
+     * This method will create an Array of Triangles (using Polygon as their Object)
+     * from an Array of vertices such as: [x,y, x,y, x,y]
+     * e.g. [0,0, 10,0, 10,10]
+     *
+     *
+     * @return {Array} returns an array of Triangles (Polygon Object)
+     */
+    TRAIL.trianglesFromVertexArray = function (vertices) {
+        var returnArray = [];
+        for (var i = 0; i < vertices.length / 6; i += 6) {
+            var polygon = new TRAIL.Polygon([i, i + 1, i + 2, i + 3, i + 4, i + 5]);
+        }
+
+        return returnArray;
+    };
+
+
 
     if (typeof exports !== 'undefined') {
         if (typeof module !== 'undefined' && module.exports) {

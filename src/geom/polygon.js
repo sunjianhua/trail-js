@@ -35,8 +35,8 @@ TRAIL.Polygon.prototype.getVertices = function()
  */
 TRAIL.Polygon.prototype.isSimple = function()
 {
-	// TODO PolyK - this is returning incorrectly
-	return PolyK.IsSimple(this.vertices);
+	var vertices = TRAIL.verticesFromPolygon(this);
+    return PolyK.IsSimple(vertices);
 };
 
 
@@ -47,31 +47,38 @@ TRAIL.Polygon.prototype.isSimple = function()
  */
 TRAIL.Polygon.prototype.isConvex = function()
 {
-	if (this.vertices.length < 4)
-		return true;
+	var vertices = TRAIL.verticesFromPolygon(this);
+	return PolyK.IsConvex(vertices);
+}
 
-	var sign = false;
-	var n = this.vertices.length;
-	for(var i= 0; i < n; i++)
-	{
-		var dx1 = this.vertices[(i + 2) % n].x - this.vertices[(i + 1) % n].x;
-		var dy1 = this.vertices[(i + 2) % n].y - this.vertices[(i + 1) % n].y;
-		var dx2 = this.vertices[i].x - this.vertices[(i + 1) % n].x;
-		var dy2 = this.vertices[i].y - this.vertices[(i + 1) % n].y;
-		var zcrossproduct = dx1 * dy2 - dy1 * dx2;
-		if(i == 0)
-		{
-			sign = zcrossproduct > 0;
-		} else
-		{
-			if (sign != (zcrossproduct > 0))
-				return false;
-		}
-	}
-	return true;
 
-	// TODO PolyK - why does this return incorrect?
-	//return PolyK.IsConvex(this.vertices);
+/**
+ * Triangulates a Polygon
+ *
+ * @return {Array} returns an array of Polygons
+ */
+TRAIL.Polygon.prototype.triangulate = function()
+{
+    var vertices = TRAIL.verticesFromPolygon(this);
+    var polykReturnValues =  PolyK.Triangulate(vertices);
+    console.log("return: " + polykReturnValues);
+    // iterate over triangle data, creating polys for use
+    var triangles = [];
+    for(var i = 0; i < polykReturnValues.length; i++)
+    {
+        console.log(vertices[polykReturnValues[i]],vertices[polykReturnValues[i+1]],
+            vertices[polykReturnValues[i+2]],vertices[polykReturnValues[i+3]],
+            vertices[polykReturnValues[i+4]],vertices[polykReturnValues[i+5]])
+
+        var polygon = new TRAIL.Polygon([
+            vertices[polykReturnValues[i]],vertices[polykReturnValues[i+1]],
+            vertices[polykReturnValues[i+2]],vertices[polykReturnValues[i+3]],
+            vertices[polykReturnValues[i+4]],vertices[polykReturnValues[i+5]]
+        ]);
+        triangles.push(polygon);
+    }
+
+    return triangles;
 }
 
 

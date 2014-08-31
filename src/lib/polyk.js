@@ -39,7 +39,7 @@ PolyK.IsSimple = function (p)
 {
 	var n = p.length >> 1;
 	if (n < 4) return true;
-	console.log("here");
+
 
 	var a1 = new PolyK._P(), a2 = new PolyK._P();
 	var b1 = new PolyK._P(), b2 = new PolyK._P();
@@ -47,7 +47,7 @@ PolyK.IsSimple = function (p)
 
 	for (var i = 0; i < n; i++)
 	{
-		a1.x = p[2 * i  ];
+        a1.x = p[2 * i  ];
 		a1.y = p[2 * i + 1];
 		if (i == n - 1)
 		{
@@ -133,6 +133,7 @@ PolyK.Reverse = function (p)
 
 PolyK.Triangulate = function (p)
 {
+    //console.dir(p)
 	var n = p.length >> 1;
 	if (n < 3) return [];
 	var tgs = [];

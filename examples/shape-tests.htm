@@ -77,8 +77,8 @@
 
             // create a poly
             var polygon1 = new TRAIL.Polygon([30,30, 90,30, 90,90, 30,90]);
-            var polygon2 = new TRAIL.Polygon([281,40, 310,40, 150,120, 301,150]);
-            var polygon3 = new TRAIL.Polygon([450,40, 550,70, 400,140, 400,120, 500,100]);
+            var polygon2 = new TRAIL.Polygon([180,40, 270,50, 290,100, 250,60]);
+            var polygon3 = new TRAIL.Polygon([450,40, 550,70, 400,140, 400,100]);
 
             // render
             drawPolygon(polygon1, true);
@@ -86,15 +86,13 @@
             drawPolygon(polygon3, true);
 
             // testing shapes for easy triangulation
-            console.log("%c Polygon Simplicity Tests* ", "background: #000000; color: #ffffff");
+            console.log("%c Polygon Shape Tests* ", "background: #ff1234; color: #ffffff");
             console.log("polygon1 isSimple(): " + polygon1.isSimple());
             console.log("polygon2 isSimple(): " + polygon2.isSimple());
             console.log("polygon3 isSimple(): " + polygon3.isSimple());
 
-            console.log("\n");
-
             // testing convex or cancave shape
-            console.log("%c Polygon Shape Tests* ", "background: #000000; color: #ffffff");
+            console.log("\n%c Polygon Shape Tests* ", "background: #ff1234; color: #ffffff");
             console.log("polygon1 isConvex(): " + polygon1.isConvex());
             console.log("polygon2 isConvex(): " + polygon2.isConvex());
             console.log("polygon3 isConvex(): " + polygon3.isConvex());
