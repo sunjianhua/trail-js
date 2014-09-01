@@ -10,8 +10,8 @@
     </head>
     <body>
     <h1>Trail.js Examples</h1>
-    <h2>Monkey Island</h2>
-    <p><b>Overview</b><br />Rough test of Triangulation in a Monkey Island scene (much win). Results shown in Console.</p>
+    <h2>Alternate Triangles</h2>
+    <p><b>Overview</b><br />Rough test of Triangulation in a test scene. Results shown in Console.</p>
     <p><a href="/">... back to examples</a></p>
     <canvas id="canvas" width="640" height="480" style="border:1px solid">
 
@@ -94,20 +94,38 @@
                 TRAIL.sayHi();
 
                 // create a poly
-                var polygon = new TRAIL.Polygon([456,123, 490,128, 523,134, 526,141, 516,149, 469,157, 529,174, 516,180, 444,160, 409,167, 359,178, 319,201, 314,238, 322,259, 481,302, 526,321, 501,339, 457,341, 324,341, 4,342, 4,278, 88,275, 195,301, 294,310, 293,286, 282,268, 267,277, 145,233, 149,223, 189,233, 258,197, 296,179, 322,171, 357,161, 378,161, 418,153, 453,147, 489,145, 505,143, 508,135, 456,128]);
-                var triangles = polygon.triangulate();
+                var polygons = [
+                    new TRAIL.Polygon([45,134, 122,51, 182,138, 138,179]),
+                    new TRAIL.Polygon([122,51, 206,19, 232,107, 182,138]),
+                    new TRAIL.Polygon([206,19, 303,10, 304,101, 232,107]),
+                    new TRAIL.Polygon([303,10, 378,32, 377,115, 304,101]),
+                    new TRAIL.Polygon([378,32, 441,61, 442,147, 377,115]),
+                    new TRAIL.Polygon([441,61, 547,61, 547,147, 441,147]),
+                    new TRAIL.Polygon([441,147, 547,147, 547,255, 441,255]),
+                    new TRAIL.Polygon([441,255, 547,255, 547,362, 441,362])
+                ];
+
+                var triangles = [];
+                for (var i = 0; i < polygons.length; i++)
+                {
+                    var triangle = polygons[i].triangulate();
+                    triangles[i] = triangle;
+                }
 
                 // testing convex or cancave shape
-                console.log("%c Monkey Island* ", "background: #ff1234; color: #ffffff");
-                console.log("Navigation Mesh Generates " + triangles.length + " triangles");
+                console.log("%c Sample Scene* ", "background: #ff1234; color: #ffffff");
 
                 // render triangles
-                for(var i = 0; i < triangles.length; i++) {
-                    var triangle = triangles[i];
-                    drawPolygon(triangle, true);
+                for(var i = 0; i < triangles.length; i++)
+                {
+                    for(var j = 0; j < triangles[i].length; j++)
+                    {
+                        var t = triangles[i][j];
+                        drawPolygon(t, true);
+                    }
                 }
             }
-            img.src = "img/monkey21full.png";
+            img.src = "img/navmesh-wip.gif";
 
 
 
