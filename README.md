@@ -1,8 +1,9 @@
 #trail-js
 A JavaScript navigation mesh pathfinding system. Work in Progress.
+http://antonmills.github.io/trail-js/
 
 ![screenshot](http://i.imgur.com/sUmb2l3.png)
-GitHub Page: http://antonmills.github.io/trail-js/
+
 
 ## About
 
