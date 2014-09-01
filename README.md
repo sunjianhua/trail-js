@@ -1,9 +1,9 @@
 #trail-js
 ---
 
-A JavaScript navigation mesh pathfinding system.
+A JavaScript navigation mesh pathfinding system. Work in Progress.
 
-EXTREMELY EARLY BUILD STATUS - DOES NOT WORK YET :)
+GitHub Page: http://antonmills.github.io/trail-js/
 
 ## About
 
@@ -25,3 +25,4 @@ With CLI:
 
   * `gulp examples` builds the current source and launches a webserver at http://localhost:8080 for the examples
   * `gulp` this is currently a developer-mode (includes watch and live-rebuild)
+
