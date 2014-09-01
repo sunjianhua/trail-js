@@ -87,20 +87,23 @@
      * @return {Array} returns an array of Polygons
      */
     TRAIL.Polygon.prototype.triangulate = function () {
-        var vertices = TRAIL.verticesFromPolygon(this);
-        var polykReturnValues = PolyK.Triangulate(vertices);
-        console.log("return: " + polykReturnValues);
-        // iterate over triangle data, creating polys for use
-        var triangles = [];
-        for (var i = 0; i < polykReturnValues.length; i++) {
-            console.log(vertices[polykReturnValues[i]], vertices[polykReturnValues[i + 1]], vertices[polykReturnValues[i + 2]], vertices[polykReturnValues[i + 3]], vertices[polykReturnValues[i + 4]], vertices[polykReturnValues[i + 5]])
+        // block triangulation if not simple
+        if (this.isSimple() == true) {
+            var vertices = TRAIL.verticesFromPolygon(this);
+            var polykReturnValues = PolyK.Triangulate(vertices);
 
-            var polygon = new TRAIL.Polygon([
-            vertices[polykReturnValues[i]], vertices[polykReturnValues[i + 1]], vertices[polykReturnValues[i + 2]], vertices[polykReturnValues[i + 3]], vertices[polykReturnValues[i + 4]], vertices[polykReturnValues[i + 5]]]);
-            triangles.push(polygon);
+            // iterate over triangle data, creating polys for use
+            var triangles = [];
+            for (var i = 0; i < polykReturnValues.length; i += 3) {
+                var polygon = new TRAIL.Polygon([
+                this.vertices[polykReturnValues[i]].x, this.vertices[polykReturnValues[i]].y, this.vertices[polykReturnValues[i + 1]].x, this.vertices[polykReturnValues[i + 1]].y, this.vertices[polykReturnValues[i + 2]].x, this.vertices[polykReturnValues[i + 2]].y]);
+                triangles.push(polygon);
+            }
+
+            return triangles;
+        } else {
+            return [];
         }
-
-        return triangles;
     }
 
 
