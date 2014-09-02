@@ -16,99 +16,26 @@
     TRAIL.sayHi = function () {
         console.log('%c trail.js* init \n', 'background: #ff1234; color: #ffffff');
     }
-    /**
-     * This class is a point implementation
-     *
-     * @class Point
-     * @constructor
-     * @param x {Integer} the x position of the point
-     * @param y {Integer} the y position of the point
-     */
-    TRAIL.Point = function (x, y) {
-        this.x = x;
-        this.y = y;
-    };
 
-
-    // constructor
-    TRAIL.Point.prototype.constructor = TRAIL.Point;
-    /**
-     * This class contains the base for polygon shapes which make up the navmesh
-     *
-     * @class Polygon
-     * @constructor
-     * @param vertices {Array} the vertices in the following format: [x,y,x,y,x,y]
-     */
-    TRAIL.Polygon = function (vertices) {
-        this.vertices = [];
-
-        // set vertices to points
-        for (var i = 0; i < vertices.length; i += 2) {
-            this.vertices.push(new TRAIL.Point(vertices[i], vertices[i + 1]));
-        }
-    };
-
-
-    /**
-     * Gets an array of the polygons vertices
-     *
-     * @return {Array} vertices in the following order: [x,y,x,y,x,y]
-     */
-    TRAIL.Polygon.prototype.getVertices = function () {
-        return this.vertices;
-    };
-
-
-    /**
-     * Tests if a Polygon is simple in nature (doesn't cross over / intersect itself)
-     *
-     * @return {Boolean} true is a simple Polygon
-     */
-    TRAIL.Polygon.prototype.isSimple = function () {
-        var vertices = TRAIL.verticesFromPolygon(this);
-        return PolyK.IsSimple(vertices);
-    };
-
-
-    /**
-     * Tests if a Polygon shape is convex
-     *
-     * @return {Boolean} true is a convex shape
-     */
-    TRAIL.Polygon.prototype.isConvex = function () {
-        var vertices = TRAIL.verticesFromPolygon(this);
-        return PolyK.IsConvex(vertices);
-    }
-
-
-    /**
-     * Triangulates a Polygon
-     *
-     * @return {Array} returns an array of Polygons
-     */
-    TRAIL.Polygon.prototype.triangulate = function () {
-        // block triangulation if not simple
-        if (this.isSimple() == true) {
-            var vertices = TRAIL.verticesFromPolygon(this);
-            var polykReturnValues = PolyK.Triangulate(vertices);
-
-            // iterate over triangle data, creating polys for use
-            var triangles = [];
-            for (var i = 0; i < polykReturnValues.length; i += 3) {
-                var polygon = new TRAIL.Polygon([
-                this.vertices[polykReturnValues[i]].x, this.vertices[polykReturnValues[i]].y, this.vertices[polykReturnValues[i + 1]].x, this.vertices[polykReturnValues[i + 1]].y, this.vertices[polykReturnValues[i + 2]].x, this.vertices[polykReturnValues[i + 2]].y]);
-                triangles.push(polygon);
-            }
-
-            return triangles;
-        } else {
-            return [];
-        }
-    }
-
-
-    // constructor
-    TRAIL.Polygon.prototype.constructor = TRAIL.Polygon;
+/*
+ [2/09/2014 5:15:10 pm] Stephen Woolcock: the edges are a better choice
+ [2/09/2014 5:16:39 pm] Stephen Woolcock: to build your graph, i would do this:
+ - run over each triangle, for each connecting verts, create an 'Edge' object
+ - put the edge object into a dictionary/lookup, with the key being a combined hash of two verts making up the tri edge (hash(a) + hash(b))
+ [2/09/2014 5:16:50 pm] Stephen Woolcock: hash( a ) + hash( b )
+ [2/09/2014 5:17:09 pm] Stephen Woolcock: - when analysing an edge, calc the hash, and check the lookup for an exisitng entry
+ [2/09/2014 5:17:26 pm] Stephen Woolcock: - if one exists, at the new tri edge to the existing Edge object
+ [2/09/2014 5:17:43 pm] Stephen Woolcock: now edge triangle edge and a connecting edge
+ [2/09/2014 5:18:08 pm] Stephen Woolcock: then you run over each triangle and get add graph edges connecting all them all
+ [2/09/2014 5:18:23 pm] Anton Mills: oh nice, yeah
+ [2/09/2014 5:18:41 pm] Stephen Woolcock: if you make your hash function return an integer, you can simply add the values together
+ [2/09/2014 5:18:47 pm] Anton Mills: going to have to hack the polyk source for that
+ [2/09/2014 5:18:49 pm] Stephen Woolcock: and it won't matter the order of vertA and vertB
+ [2/09/2014 5:19:10 pm] Stephen Woolcock: hash( a ) + hash( b ) == hash( b ) + hash( a )
+ [2/09/2014 5:19:10 pm] Stephen Woolcock: :)
+ [2/09/2014 5:19:23 pm] Stephen Woolcock: assuming they don't get too large and overflow :D
+ [2/09/2014 5:19:36 pm] Stephen Woolcock: i think i had an AS3 function that did tha
+ */
 /*
  PolyK library
  url: http://polyk.ivank.net
@@ -692,6 +619,99 @@
 
 
 
+    /**
+     * This class is a point implementation
+     *
+     * @class Point
+     * @constructor
+     * @param x {Integer} the x position of the point
+     * @param y {Integer} the y position of the point
+     */
+    TRAIL.Point = function (x, y) {
+        this.x = x;
+        this.y = y;
+    };
+
+
+    // constructor
+    TRAIL.Point.prototype.constructor = TRAIL.Point;
+    /**
+     * This class contains the base for polygon shapes which make up the navmesh
+     *
+     * @class Polygon
+     * @constructor
+     * @param vertices {Array} the vertices in the following format: [x,y,x,y,x,y]
+     */
+    TRAIL.Polygon = function (vertices) {
+        this.vertices = [];
+
+        // set vertices to points
+        for (var i = 0; i < vertices.length; i += 2) {
+            this.vertices.push(new TRAIL.Point(vertices[i], vertices[i + 1]));
+        }
+    };
+
+
+    /**
+     * Gets an array of the polygons vertices
+     *
+     * @return {Array} vertices in the following order: [x,y,x,y,x,y]
+     */
+    TRAIL.Polygon.prototype.getVertices = function () {
+        return this.vertices;
+    };
+
+
+    /**
+     * Tests if a Polygon is simple in nature (doesn't cross over / intersect itself)
+     *
+     * @return {Boolean} true is a simple Polygon
+     */
+    TRAIL.Polygon.prototype.isSimple = function () {
+        var vertices = TRAIL.verticesFromPolygon(this);
+        return PolyK.IsSimple(vertices);
+    };
+
+
+    /**
+     * Tests if a Polygon shape is convex
+     *
+     * @return {Boolean} true is a convex shape
+     */
+    TRAIL.Polygon.prototype.isConvex = function () {
+        var vertices = TRAIL.verticesFromPolygon(this);
+        return PolyK.IsConvex(vertices);
+    }
+
+
+    /**
+     * Triangulates a Polygon
+     *
+     * @return {Array} returns an array of Polygons
+     */
+    TRAIL.Polygon.prototype.triangulate = function () {
+        // block triangulation if not simple
+        if (this.isSimple() == true) {
+            var vertices = TRAIL.verticesFromPolygon(this);
+            var polykReturnValues = PolyK.Triangulate(vertices);
+
+            // iterate over triangle data, creating polys for use
+            var triangles = [];
+            for (var i = 0; i < polykReturnValues.length; i += 3) {
+                var polygon = new TRAIL.Polygon([
+                this.vertices[polykReturnValues[i]].x, this.vertices[polykReturnValues[i]].y, this.vertices[polykReturnValues[i + 1]].x, this.vertices[polykReturnValues[i + 1]].y, this.vertices[polykReturnValues[i + 2]].x, this.vertices[polykReturnValues[i + 2]].y]);
+                triangles.push(polygon);
+            }
+
+            return triangles;
+        } else {
+            return [];
+        }
+    }
+
+
+    // constructor
+    TRAIL.Polygon.prototype.constructor = TRAIL.Polygon;
     if (typeof exports !== 'undefined') {
         if (typeof module !== 'undefined' && module.exports) {
             exports = module.exports = TRAIL;
