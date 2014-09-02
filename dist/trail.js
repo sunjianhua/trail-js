@@ -36,6 +36,114 @@
  [2/09/2014 5:19:23 pm] Stephen Woolcock: assuming they don't get too large and overflow :D
  [2/09/2014 5:19:36 pm] Stephen Woolcock: i think i had an AS3 function that did tha
  */
+    /**
+     * This class is a container for all mesh related functionality.
+     * Meshes contain n amount of Polygons.
+     * Polygons contain n amount of Points.
+     *
+     * @class Mesh
+     * @constructor
+     */
+    TRAIL.Mesh = function () {
+        this.polygons = [];
+    };
+
+
+    /**
+     * Gets an array of the mesh's polygons
+     *
+     * @return {Array} Polygons
+     */
+    TRAIL.Mesh.prototype.getPolygons = function () {
+        return this.polygons;
+    };
+
+
+    /**
+     * Gets a single polygon by id
+     *
+     * @return {Polygon} Polygon by id
+     */
+    TRAIL.Mesh.prototype.getPolygon = function (id) {
+        return this.polygons[id];
+    };
+
+
+    /**
+     * adds a Polygon to the meshes polygons
+     *
+     * @return {Array} Polygons
+     */
+    TRAIL.Mesh.prototype.addPolygon = function (polygon) {
+        this.polygons.push(polygon);
+    };
+
+
+
+
+
+
+    // constructor
+    TRAIL.Mesh.prototype.constructor = TRAIL.Mesh;
+    /**
+     * This class is a point implementation
+     *
+     * @class Point
+     * @constructor
+     * @param x {Integer} the x position of the point
+     * @param y {Integer} the y position of the point
+     */
+    TRAIL.Point = function (x, y) {
+        this.x = x;
+        this.y = y;
+    };
+
+
+    // constructor
+    TRAIL.Point.prototype.constructor = TRAIL.Point;
+    /**
+     * This class contains the base for polygon shapes which make up the navmesh
+     *
+     * @class Polygon
+     * @constructor
+     * @param vertices {Array} the vertices in the following format: [x,y,x,y,x,y]
+     */
+    TRAIL.Polygon = function (vertices) {
+        this.vertices = [];
+        this.edges = []''
+
+        // set vertices to points
+        for (var i = 0; i < vertices.length; i += 2) {
+            this.vertices.push(new TRAIL.Point(vertices[i], vertices[i + 1]));
+        }
+    };
+
+
+    /**
+     * Gets an array of the polygons vertices
+     *
+     * @return {Array} vertices in the following order: [x,y,x,y,x,y]
+     */
+    TRAIL.Polygon.prototype.getVertices = function () {
+        return this.vertices;
+    };
+
+
+    /**
+     * Gets a polygons point by id
+     *
+     * @return {Point} Point by id
+     */
+    TRAIL.Polygon.prototype.getPoint = function (id) {
+        return this.vertices[id];
+    };
+
+
+
+
+
+    // constructor
+    TRAIL.Polygon.prototype.constructor = TRAIL.Polygon;
 /*
  PolyK library
  url: http://polyk.ivank.net
@@ -619,99 +727,6 @@
 
 
 
-    /**
-     * This class is a point implementation
-     *
-     * @class Point
-     * @constructor
-     * @param x {Integer} the x position of the point
-     * @param y {Integer} the y position of the point
-     */
-    TRAIL.Point = function (x, y) {
-        this.x = x;
-        this.y = y;
-    };
-
-
-    // constructor
-    TRAIL.Point.prototype.constructor = TRAIL.Point;
-    /**
-     * This class contains the base for polygon shapes which make up the navmesh
-     *
-     * @class Polygon
-     * @constructor
-     * @param vertices {Array} the vertices in the following format: [x,y,x,y,x,y]
-     */
-    TRAIL.Polygon = function (vertices) {
-        this.vertices = [];
-
-        // set vertices to points
-        for (var i = 0; i < vertices.length; i += 2) {
-            this.vertices.push(new TRAIL.Point(vertices[i], vertices[i + 1]));
-        }
-    };
-
-
-    /**
-     * Gets an array of the polygons vertices
-     *
-     * @return {Array} vertices in the following order: [x,y,x,y,x,y]
-     */
-    TRAIL.Polygon.prototype.getVertices = function () {
-        return this.vertices;
-    };
-
-
-    /**
-     * Tests if a Polygon is simple in nature (doesn't cross over / intersect itself)
-     *
-     * @return {Boolean} true is a simple Polygon
-     */
-    TRAIL.Polygon.prototype.isSimple = function () {
-        var vertices = TRAIL.verticesFromPolygon(this);
-        return PolyK.IsSimple(vertices);
-    };
-
-
-    /**
-     * Tests if a Polygon shape is convex
-     *
-     * @return {Boolean} true is a convex shape
-     */
-    TRAIL.Polygon.prototype.isConvex = function () {
-        var vertices = TRAIL.verticesFromPolygon(this);
-        return PolyK.IsConvex(vertices);
-    }
-
-
-    /**
-     * Triangulates a Polygon
-     *
-     * @return {Array} returns an array of Polygons
-     */
-    TRAIL.Polygon.prototype.triangulate = function () {
-        // block triangulation if not simple
-        if (this.isSimple() == true) {
-            var vertices = TRAIL.verticesFromPolygon(this);
-            var polykReturnValues = PolyK.Triangulate(vertices);
-
-            // iterate over triangle data, creating polys for use
-            var triangles = [];
-            for (var i = 0; i < polykReturnValues.length; i += 3) {
-                var polygon = new TRAIL.Polygon([
-                this.vertices[polykReturnValues[i]].x, this.vertices[polykReturnValues[i]].y, this.vertices[polykReturnValues[i + 1]].x, this.vertices[polykReturnValues[i + 1]].y, this.vertices[polykReturnValues[i + 2]].x, this.vertices[polykReturnValues[i + 2]].y]);
-                triangles.push(polygon);
-            }
-
-            return triangles;
-        } else {
-            return [];
-        }
-    }
-
-
-    // constructor
-    TRAIL.Polygon.prototype.constructor = TRAIL.Polygon;
     if (typeof exports !== 'undefined') {
         if (typeof module !== 'undefined' && module.exports) {
             exports = module.exports = TRAIL;

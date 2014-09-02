@@ -10,10 +10,10 @@
     </head>
     <body>
     <h1>Trail.js Examples</h1>
-    <h2>Monkey Island</h2>
-    <p><b>Overview</b><br />Rough test of Triangulation in a Monkey Island scene (much win). Results shown in Console.</p>
+    <h2>Polygon Mesh</h2>
+    <p><b>Overview</b><br />Rough test of pure polygon in a test scene.</p>
     <p><a href="/">... back to examples</a></p>
-    <canvas id="canvas" width="640" height="480" style="border:1px solid">
+    <canvas id="canvas" width="640" height="430" style="border:1px solid">
 
     <!-- on ready -->
     <script type="text/javascript">
@@ -28,10 +28,21 @@
             // --- canvas helpers ---
 
             // canvas
+            var canvas = document.getElementById('canvas');
             var ctx = document.getElementById('canvas').getContext('2d');
 
+            // draw a point
+            function drawPoint(point)
+            {
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI, false);
+                ctx.fillStyle = "rgba(0, 0, 255, 1)";
+                ctx.closePath();
+                ctx.fill();
+            }
+
             // draw path
-            function drawPolygon(poly, drawPoints)
+            function drawPolygon(poly)
             {
                 var vertices = poly.getVertices();
 
@@ -50,22 +61,29 @@
                 ctx.fill();
                 ctx.stroke();
 
-                // draw vertices
-                if(drawPoints)
+                for(var i = 0; i < vertices.length; i++)
                 {
-                    for(var i = 0; i < vertices.length; i++)
-                    {
-                        ctx.beginPath();
-                        ctx.arc(vertices[i].x, vertices[i].y, 2, 0, 2 * Math.PI, false);
-                        ctx.fillStyle = "rgba(0, 0, 255, 1)";
-                        ctx.closePath();
-                        ctx.fill();
-                    }
+                    // draw vertices
+                    drawPoint(vertices[i]);
+                }
+
+            }
+
+            // draws an entire mesh
+            function drawMesh(mesh)
+            {
+                var polygons = mesh.getPolygons();
+                for(var i = 0; i < polygons.length; i++)
+                {
+                    var polygon = polygons[i];
+                    drawPolygon(polygon, true);
                 }
             }
 
-            var canvas = document.getElementById('canvas');
 
+
+
+            // MOUSE CLICK DETECTION
             function getMousePos(canvas, evt) {
                 var rect = canvas.getBoundingClientRect();
                 return {
@@ -73,7 +91,6 @@
                     y: (evt.clientY - rect.top).toFixed(0)
                 };
             }
-
             canvas.addEventListener('mousedown', function(evt) {
                 var mousePos = getMousePos(canvas, evt);
                 var message = mousePos.x + ',' + mousePos.y + ", ";
@@ -81,6 +98,7 @@
             }, false);
 
             // -----------
+
 
 
 
@@ -93,23 +111,20 @@
                 // init app
                 TRAIL.sayHi();
 
-                // create a poly
-                var polygon = new TRAIL.Polygon([456,123, 490,128, 523,134, 526,141, 516,149, 469,157, 529,174, 516,180, 444,160, 409,167, 359,178, 319,201, 314,238, 322,259, 481,302, 526,321, 501,339, 457,341, 324,341, 4,342, 4,278, 88,275, 195,301, 294,310, 293,286, 282,268, 267,277, 145,233, 149,223, 189,233, 258,197, 296,179, 322,171, 357,161, 378,161, 418,153, 453,147, 489,145, 505,143, 508,135, 456,128]);
-                var triangles = polygon.triangulate();
+                // create a mesh
+                var mesh = new TRAIL.Mesh();
 
-                // testing convex or cancave shape
-                console.log("%c Monkey Island* ", "background: #ff1234; color: #ffffff");
-                console.log("Navigation Mesh Generates " + triangles.length + " triangles");
+                // add two polygons (which overlap - it should fix this)
+                mesh.addPolygon(new TRAIL.Polygon([45,134, 122,51, 182,138, 138,179]));
+                mesh.addPolygon(new TRAIL.Polygon([122,51, 206,19, 232,107, 182,138]));
 
-                // render triangles
-                for(var i = 0; i < triangles.length; i++) {
-                    var triangle = triangles[i];
-                    drawPolygon(triangle, true);
-                }
+                // update a single vertex position
+                mesh.getPolygon(0).getPoint(1).y -= 20;
+
+                // render mesh
+                drawMesh(mesh);
             }
-            img.src = "img/monkey21full.png";
-
-
+            img.src = "img/navmesh-wip.png";
 
 
         }
