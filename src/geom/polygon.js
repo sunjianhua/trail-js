@@ -13,7 +13,25 @@ TRAIL.Polygon = function(vertices)
     // set vertices to points
     for(var i = 0; i < vertices.length; i += 2)
     {
-        this.vertices.push(new TRAIL.Point(vertices[i], vertices[i+1]));
+        // create the point
+        var point = new TRAIL.Point(vertices[i], vertices[i+1]);
+        this.vertices.push(point);
+    }
+
+    // create the edges
+    for (var i = 0; i < this.vertices.length-1; i++)
+    {
+        var point1 = this.vertices[i];
+        var point2 = this.vertices[i];
+
+        // create the edges
+        var edge =
+        {
+            id: vertices[i] + vertices[i+1],
+            point1: point1,
+            point2: point2
+        }
+        this.edges.push(edge);
     }
 };
 
