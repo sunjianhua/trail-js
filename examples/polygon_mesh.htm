@@ -114,9 +114,14 @@
                 // create a mesh
                 var mesh = new TRAIL.Mesh();
 
-                // add two polygons (which overlap - it should fix this)
-                mesh.addPolygon(new TRAIL.Polygon([45,134, 122,51, 182,138, 138,179]));
-                mesh.addPolygon(new TRAIL.Polygon([122,51, 206,19, 232,107, 182,138]));
+                // add two polygons (which overlap - it should fix this when vertices are shared correctly)
+                var p1 = new TRAIL.Polygon();
+                var p2 = new TRAIL.Polygon();
+                p1.setVertices([45,134, 122,51, 182,138, 138,179]);
+                p2.setVertices([122,51, 206,19, 232,107, 182,138]);
+                mesh.addPolygon(p1);
+                mesh.addPolygon(p2);
+                mesh.weldPoints(mesh.getPolygon(0).getPoint(1), mesh.getPolygon(1).getPoint(0));
 
                 // update a single vertex position
                 mesh.getPolygon(0).getPoint(1).y -= 20;
