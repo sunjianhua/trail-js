@@ -31,54 +31,52 @@
             var canvas = document.getElementById('canvas');
             var ctx = document.getElementById('canvas').getContext('2d');
 
-            // draw a point
-            function drawPoint(point)
+            // draw a vertex
+            function drawVertex(vertex)
             {
                 ctx.beginPath();
-                ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI, false);
+                ctx.arc(vertex.x, vertex.y, 2, 0, 2 * Math.PI, false);
                 ctx.fillStyle = "rgba(0, 0, 255, 1)";
                 ctx.closePath();
                 ctx.fill();
             }
-
-            // draw path
-            function drawPolygon(poly)
+            function drawVertices(mesh)
             {
-                var vertices = poly.getVertices();
-
-                // draw poly
-                ctx.fillStyle = "rgba(20, 20, 255, 0.5)";
-                ctx.strokeStyle = '#ff0000';
-                ctx.beginPath();
-                ctx.moveTo(vertices[0].x, vertices[0].y);
-
-                for(var i = 1; i < vertices.length; i++)
+                var verts = mesh.getVertices();
+                // ES6
+                verts.forEach(function(vertex)
                 {
-                    ctx.lineTo(vertices[i].x, vertices[i].y);
-                }
-
-                ctx.closePath();
-                ctx.fill();
-                ctx.stroke();
-
-                for(var i = 0; i < vertices.length; i++)
-                {
-                    // draw vertices
-                    drawPoint(vertices[i]);
-                }
-
+                    drawVertex(vertex);
+                });
             }
-
-            // draws an entire mesh
-            function drawMesh(mesh)
+            function drawPolygons(mesh)
             {
                 var polygons = mesh.getPolygons();
+
+                // iterate and try to draw polygons
                 for(var i = 0; i < polygons.length; i++)
                 {
                     var polygon = polygons[i];
-                    drawPolygon(polygon, true);
+                    var vertices = polygon.getVertices();
+
+                    // draw poly
+                    ctx.fillStyle = "rgba(20, 20, 255, 0.5)";
+                    ctx.strokeStyle = '#ff0000';
+                    ctx.beginPath();
+                    ctx.moveTo(vertices[0].x, vertices[0].y);
+
+                    // draw each vertex
+                    for (var j = 0; j < vertices.length; j++) {
+                        ctx.lineTo(vertices[j].x, vertices[j].y);
+                    }
+
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
                 }
             }
+
+
 
 
 
@@ -115,19 +113,19 @@
                 var mesh = new TRAIL.Mesh();
 
                 // add two polygons (which overlap - it should fix this when vertices are shared correctly)
-                var p1 = new TRAIL.Polygon();
-                var p2 = new TRAIL.Polygon();
-                p1.setVertices([45,134, 122,51, 182,138, 138,179]);
-                p2.setVertices([122,51, 206,19, 232,107, 182,138]);
-                mesh.addPolygon(p1);
-                mesh.addPolygon(p2);
-                mesh.weldPoints(mesh.getPolygon(0).getPoint(1), mesh.getPolygon(1).getPoint(0));
+                mesh.setVerticesByXY([45,134, 122,51, 182,138, 138,179,   122,51, 206,19, 232,107, 182,138]);
+                mesh.addPolygonByHashes([45+134, 122+51, 182+138, 138+179]);
+                mesh.addPolygonByHashes([122+51, 206+19, 232+107, 182+138]);
 
                 // update a single vertex position
-                mesh.getPolygon(0).getPoint(1).y -= 20;
+                var vertex = mesh.getVertex(122+51);
+                vertex.y += 100;
 
                 // render mesh
-                drawMesh(mesh);
+                drawPolygons(mesh);
+                drawVertices(mesh);
+
+                //drawMesh(mesh);
             }
             img.src = "img/navmesh-wip.png";
 

@@ -11,71 +11,31 @@ TRAIL.Polygon = function()
 
 
 /**
- * Gets an array of the polygons vertices
- *
- * @return {Array} vertices in the following order: [x,y,x,y,x,y]
- */
-TRAIL.Polygon.prototype.getVertices = function()
-{
-    return this.vertices;
-};
-
-
-/**
- * Gets all of a polygons points
- *
- * @return {Array} Points
- */
-TRAIL.Polygon.prototype.getPoints = function()
-{
-    return this.vertices;
-};
-
-
-/**
- * Gets a polygons point by id
- *
- * @return {Point} Point by id
- */
-TRAIL.Polygon.prototype.getPoint = function(id)
-{
-    return this.vertices[id];
-};
-
-
-/**
- * Sets a polygons point by id - used in welding points
- *
- * @param id {Integer} the id of the Point to set
- * @param point {Point} the new Point object
- */
-TRAIL.Polygon.prototype.setPoint = function(id, point)
-{
-    this.vertices[id] = point;
-};
-
-
-/**
  * Set Polygon by Vertices
  *
- * @param vertices {Array} the vertices in the following format: [x,y,x,y,x,y]
+ * @param vertices {Array} the Vertices to make up the Polygon
  */
 TRAIL.Polygon.prototype.setVertices = function(vertices)
 {
     this.vertices = [];
 
     // set vertices to points
-    for(var i = 0; i < vertices.length; i += 2)
+    for(var i = 0; i < vertices.length; i++)
     {
-        // create the point
-        var point = new TRAIL.Point(vertices[i], vertices[i+1]);
-        this.vertices.push(point);
+        this.vertices.push(vertices[i]);
     }
-
-    // TODO calc Edges here?
 };
 
 
+/**
+ * Get Polygon Vertices
+ *
+ * @return {Array} Array of Vertices
+ */
+TRAIL.Polygon.prototype.getVertices = function()
+{
+    return this.vertices;
+};
 
 
 // constructor
