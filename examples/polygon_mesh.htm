@@ -42,18 +42,23 @@
             }
             function drawVertices(mesh)
             {
-                var verts = mesh.getVertices();
-                // ES6
-                verts.forEach(function(vertex)
+                var polygons = mesh.getPolygons();
+                for (var i = 0; i < polygons.length; i++)
                 {
-                    drawVertex(vertex);
-                });
+                    var polygon = polygons[i];
+                    var vertices = polygon.getVertices();
+                    for (var j = 0; j < vertices.length; j++)
+                    {
+                        var vertex = vertices[j];
+                        drawVertex(vertex);
+                    }
+                }
             }
             function drawPolygons(mesh)
             {
                 var polygons = mesh.getPolygons();
 
-                // iterate and try to draw polygons
+                // iterate mesh and draw polygons
                 for(var i = 0; i < polygons.length; i++)
                 {
                     var polygon = polygons[i];
@@ -113,13 +118,15 @@
                 var mesh = new TRAIL.Mesh();
 
                 // add two polygons (which overlap - it should fix this when vertices are shared correctly)
-                mesh.setVerticesByXY([45,134, 122,51, 182,138, 138,179,   122,51, 206,19, 232,107, 182,138]);
-                mesh.addPolygonByHashes([45+134, 122+51, 182+138, 138+179]);
-                mesh.addPolygonByHashes([122+51, 206+19, 232+107, 182+138]);
+                var polygon1 = new TRAIL.Polygon([45,134, 122,51, 182,138, 138,179]);
+                var polygon2 = new TRAIL.Polygon([122,51, 206,19, 232,107, 182,138]);
+                mesh.addPolygon(polygon1);
+                mesh.addPolygon(polygon2);
 
                 // update a single vertex position
-                var vertex = mesh.getVertex(122+51);
-                vertex.y += 100;
+                //var vertex = mesh.getPolygon(0)//.getVertex(1);
+                //console.dir(vertex);
+                //vertex.y += 100;
 
                 // render mesh
                 drawPolygons(mesh);

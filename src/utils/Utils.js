@@ -46,3 +46,17 @@ TRAIL.trianglesFromVertexArray = function(vertices)
 };
 
 
+/**
+ * Return a hash from a number.
+ *
+ * @return {Integer} returns a unique hash
+ */
+TRAIL.generateHash = function(a)
+{
+	a = (a ^ 61) ^ (a >> 16);
+	a += (a << 3);
+	a ^= (a >> 4);
+	a *= 0x27D4EB2D;
+	a ^= (a >> 15);
+	return a;
+};
