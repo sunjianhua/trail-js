@@ -79,17 +79,6 @@
     }
 
 
-    /**
-     * Weld Vertices
-     *
-     * @param vertex1 {Vertex} Vertex 1
-     * @param vertex2 {Vertex} Vertex 2 to be welded to Vertex 1
-     */
-    TRAIL.Mesh.prototype.weldVertex = function (polygon1, polygon2, vertex1, vertex2) {
-        polygon2.setVertex(vertex2, polygon1.getVertex(vertex1));
-    }
-
-
 
     // constructor
     TRAIL.Mesh.prototype.constructor = TRAIL.Mesh;
@@ -149,12 +138,12 @@
     /**
      * Set a specific Vertex
      *
-     * @return {Vertex} Array of Vertices
+     * @param id {integer} id of the Vertex to replace
+     * @param vertex {Vertex} Vertex to be replaced with
      */
     TRAIL.Polygon.prototype.setVertex = function (id, vertex) {
         this.vertices[id] = vertex;
     };
-
 
 
     // constructor

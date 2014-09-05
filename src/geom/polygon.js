@@ -60,13 +60,13 @@ TRAIL.Polygon.prototype.getVertex = function(id)
 /**
  * Set a specific Vertex
  *
- * @return {Vertex} Array of Vertices
+ * @param id {integer} id of the Vertex to replace
+ * @param vertex {Vertex} Vertex to be replaced with
  */
 TRAIL.Polygon.prototype.setVertex = function(id, vertex)
 {
 	this.vertices[id] = vertex;
 };
-
 
 
 // constructor
