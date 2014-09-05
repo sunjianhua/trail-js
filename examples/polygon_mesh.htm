@@ -123,10 +123,13 @@
                 mesh.addPolygon(polygon1);
                 mesh.addPolygon(polygon2);
 
+                // weld
+                
+                //mesh.weldVertex(mesh.getPolygon(0), mesh.getPolygon(1), 1, 0);
+
                 // update a single vertex position
-                //var vertex = mesh.getPolygon(0)//.getVertex(1);
-                //console.dir(vertex);
-                //vertex.y += 100;
+                var vertex = mesh.getPolygon(0).getVertex(1);
+                vertex.y += 100;
 
                 // render mesh
                 drawPolygons(mesh);

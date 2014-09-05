@@ -57,6 +57,17 @@ TRAIL.Polygon.prototype.getVertex = function(id)
 };
 
 
+/**
+ * Set a specific Vertex
+ *
+ * @return {Vertex} Array of Vertices
+ */
+TRAIL.Polygon.prototype.setVertex = function(id, vertex)
+{
+	this.vertices[id] = vertex;
+};
+
+
 
 // constructor
 TRAIL.Polygon.prototype.constructor = TRAIL.Polygon;
