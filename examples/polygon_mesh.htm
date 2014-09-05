@@ -123,7 +123,7 @@
                 mesh.addPolygon(polygon1);
                 mesh.addPolygon(polygon2);
 
-                // weld
+                // manual weld - moving to automatic somehow
                 polygon2.setVertex(0, polygon1.getVertex(1));
 
                 // update a single vertex position
@@ -133,12 +133,8 @@
                 // render mesh
                 drawPolygons(mesh);
                 drawVertices(mesh);
-
-                //drawMesh(mesh);
             }
             img.src = "img/navmesh-wip.png";
-
-
         }
     </script>
     </body>

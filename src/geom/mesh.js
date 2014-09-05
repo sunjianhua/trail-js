@@ -9,6 +9,7 @@
 TRAIL.Mesh = function()
 {
     this.polygons = [];
+	this.polygonLinks = [];
 };
 
 
