@@ -118,18 +118,16 @@
                 var mesh = new TRAIL.Mesh();
 
                 // add two polygons (which overlap - it should fix this when vertices are shared correctly)
-                var polygon1 = new TRAIL.Polygon([45,134, 122,51, 182,138, 138,179]);
-                var polygon2 = new TRAIL.Polygon([122,51, 206,19, 232,107, 182,138]);
-                mesh.addPolygon(polygon1);
-                mesh.addPolygon(polygon2);
+                mesh.addPolygon(new TRAIL.Polygon([45,134, 122,51, 182,138, 138,179]));
+                mesh.addPolygon(new TRAIL.Polygon([122,51, 206,19, 232,107, 182,138]));
+                mesh.addPolygon(new TRAIL.Polygon([206,19, 303,10, 304,101, 232,107]));
+                mesh.addPolygon(new TRAIL.Polygon([303,10, 378,32, 377,115, 304,101]));
+                mesh.addPolygon(new TRAIL.Polygon([378,32, 441,61, 442,147, 377,115]));
+                mesh.addPolygon(new TRAIL.Polygon([441,61, 547,61, 547,147, 441,147]));
+                mesh.addPolygon(new TRAIL.Polygon([441,147, 547,147, 547,255, 441,255]));
+                mesh.addPolygon(new TRAIL.Polygon([441,255, 547,255, 547,362, 441,362]));
 
-                // manual weld - moving to automatic somehow
-                //polygon2.setVertex(0, polygon1.getVertex(1));
-
-                // update a single vertex position
-                //var vertex = mesh.getPolygon(0).getVertex(1);
-                //vertex.y += 40;
-
+                // calculate edges
                 mesh.calculatePolygonLinks();
 
                 // render mesh
