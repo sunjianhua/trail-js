@@ -47,11 +47,12 @@
     TRAIL.Mesh = function () {
         this.polygons = [];
         this.polygonLinks = [];
+        this.graph = null;
     };
 
 
     /**
-     * Gets all Polygons
+     * Returns all Polygons in an Array
      *
      * @return {Array} Array of Polygons
      */
@@ -61,7 +62,8 @@
 
 
     /**
-     * Gets a Polygon by id
+     * Returns a single Polygon by id, the id
+     * is it's location in the Array - not very user friendly atm
      *
      * @return {Polygon} Polygon
      */
@@ -71,9 +73,9 @@
 
 
     /**
-     * Generate a Polygon by Vertex hash
+     * Adds a Polygon object to the Mesh
      *
-     * @param polygon {Polygon} the vertices to be used by hash
+     * @param polygon {Polygon} the Polygon to be added to the Mesh
      */
     TRAIL.Mesh.prototype.addPolygon = function (polygon) {
         this.polygons.push(polygon);
@@ -81,11 +83,12 @@
 
 
     /**
-     * Test edge collection
+     * Prepares the Graph for use by the A* Agent for pathfinding
      *
-     * @param polygon {Polygon} the vertices to be used by hash
+     *
+     * @return {Graph} Returns the Graph to be used by A*
      */
-    TRAIL.Mesh.prototype.calculatePolygonLinks = function () {
+    TRAIL.Mesh.prototype.prepareGraph = function () {
         // iterate over polygons - getting all edges
         for (var i = 0; i < this.polygons.length; i++) {
             var polygon = this.polygons[i];
@@ -101,9 +104,6 @@
                 }
             }
         }
-
-        console.log("graph test*");
-        console.dir(this.polygonLinks);
     }
 
 
@@ -152,8 +152,6 @@
 
             this.edges.push(edge);
         }
-
-        console.log(this.edges);
     };
 
 
@@ -753,6 +751,35 @@
     PolyK._tp = [];
     for (var i = 0; i < 10; i++) PolyK._tp.push(new PolyK._P(0, 0));
 
+    /**
+     * This class makes up the Graph for the A* Navigation
+     *
+     * @class Graph
+     * @constructor
+     */
+    TRAIL.Graph = function () {
+
+    };
+
+
+    // constructor
+    TRAIL.Graph.prototype.constructor = TRAIL.Graph;
+    /**
+     * This GraphNode is used in the A* Navigation
+     * A Graph has multiple GraphNodes.
+     * The GraphNodes are used as paths and as such have a reference
+     * to other connected GraphNodes.
+     *
+     * @class GraphNode
+     * @constructor
+     */
+    TRAIL.GraphNode = function () {
+
+    };
+
+
+    // GraphNode
+    TRAIL.GraphNode.prototype.constructor = TRAIL.GraphNode;
     /**
      * Return vertices in a single Array.
      * Used mostly for interactions between PolyK which requires an

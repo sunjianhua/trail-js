@@ -47,8 +47,6 @@ TRAIL.Polygon.prototype.setVertices = function(vertices)
 
 		this.edges.push(edge);
 	}
-
-	console.log(this.edges);
 };
 
 

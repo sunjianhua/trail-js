@@ -117,7 +117,7 @@
                 // create a mesh
                 var mesh = new TRAIL.Mesh();
 
-                // add two polygons (which overlap - it should fix this when vertices are shared correctly)
+                // add some Polygons by hand
                 mesh.addPolygon(new TRAIL.Polygon([45,134, 122,51, 182,138, 138,179]));
                 mesh.addPolygon(new TRAIL.Polygon([122,51, 206,19, 232,107, 182,138]));
                 mesh.addPolygon(new TRAIL.Polygon([206,19, 303,10, 304,101, 232,107]));
@@ -127,12 +127,13 @@
                 mesh.addPolygon(new TRAIL.Polygon([441,147, 547,147, 547,255, 441,255]));
                 mesh.addPolygon(new TRAIL.Polygon([441,255, 547,255, 547,362, 441,362]));
 
-                // calculate edges
-                mesh.calculatePolygonLinks();
+                // prepares a Graph for an A* Agent to use
+                mesh.prepareGraph();
 
                 // render mesh
                 drawPolygons(mesh);
                 drawVertices(mesh);
+
             }
             img.src = "img/navmesh-wip.png";
         }
