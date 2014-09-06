@@ -46,6 +46,37 @@ TRAIL.Mesh.prototype.addPolygon = function(polygon)
 }
 
 
+/**
+ * Test edge collection
+ *
+ * @param polygon {Polygon} the vertices to be used by hash
+ */
+TRAIL.Mesh.prototype.calculatePolygonLinks = function()
+{
+	// iterate over polygons - getting all edges
+	for (var i = 0; i < this.polygons.length; i++)
+	{
+		var polygon = this.polygons[i];
+		var edges = polygon.getEdges();
+
+		// iterate over all edge hashes and placing them in the polygonLink array (using their hash)
+		for (var j = 0; j < edges.length; j++)
+		{
+			var edge = edges[j];
+			if(this.polygonLinks[edge] == undefined)
+			{
+				this.polygonLinks[edge] = [polygon];
+			} else
+			{
+				this.polygonLinks[edge].push(polygon);
+			}
+		}
+	}
+
+	console.log("graph test*");
+	console.dir(this.polygonLinks);
+}
+
 
 // constructor
 TRAIL.Mesh.prototype.constructor = TRAIL.Mesh;

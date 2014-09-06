@@ -124,11 +124,13 @@
                 mesh.addPolygon(polygon2);
 
                 // manual weld - moving to automatic somehow
-                polygon2.setVertex(0, polygon1.getVertex(1));
+                //polygon2.setVertex(0, polygon1.getVertex(1));
 
                 // update a single vertex position
-                var vertex = mesh.getPolygon(0).getVertex(1);
-                vertex.y += 40;
+                //var vertex = mesh.getPolygon(0).getVertex(1);
+                //vertex.y += 40;
+
+                mesh.calculatePolygonLinks();
 
                 // render mesh
                 drawPolygons(mesh);

@@ -80,6 +80,32 @@
     }
 
 
+    /**
+     * Test edge collection
+     *
+     * @param polygon {Polygon} the vertices to be used by hash
+     */
+    TRAIL.Mesh.prototype.calculatePolygonLinks = function () {
+        // iterate over polygons - getting all edges
+        for (var i = 0; i < this.polygons.length; i++) {
+            var polygon = this.polygons[i];
+            var edges = polygon.getEdges();
+
+            // iterate over all edge hashes and placing them in the polygonLink array (using their hash)
+            for (var j = 0; j < edges.length; j++) {
+                var edge = edges[j];
+                if (this.polygonLinks[edge] == undefined) {
+                    this.polygonLinks[edge] = [polygon];
+                } else {
+                    this.polygonLinks[edge].push(polygon);
+                }
+            }
+        }
+
+        console.log("graph test*");
+        console.dir(this.polygonLinks);
+    }
+
 
     // constructor
     TRAIL.Mesh.prototype.constructor = TRAIL.Mesh;
@@ -91,37 +117,8 @@
      * @constructor
      */
     TRAIL.Polygon = function (vertices) {
-        this.vertices = [];
-        this.edges = [];
-        this.calcs = [];
-
-        // set vertices to points
-        for (var i = 0; i < vertices.length; i += 2) {
-            var vertex = new TRAIL.Vertex(vertices[i], vertices[i + 1]);
-            this.vertices.push(vertex);
-        }
-
-        // calculate all edges
-        for (var i = 0; i < this.vertices.length; i++) {
-            var hash1, hash2, edge;
-            if (i != this.vertices.length - 1) {
-                hash1 = TRAIL.generateHash(this.vertices[i].x) + TRAIL.generateHash(this.vertices[i].y);
-                hash2 = TRAIL.generateHash(this.vertices[i + 1].x) + TRAIL.generateHash(this.vertices[i + 1].y);
-                this.calcs.push(this.vertices[i].x + this.vertices[i].y + this.vertices[i + 1].x + this.vertices[i + 1].y)
-                edge = hash1 + hash2;
-            } else {
-                hash1 = TRAIL.generateHash(this.vertices[this.vertices.length - 1].x) + TRAIL.generateHash(this.vertices[0].y);
-                hash2 = TRAIL.generateHash(this.vertices[this.vertices.length - 1].x) + TRAIL.generateHash(this.vertices[0].y);
-                this.calcs.push(this.vertices[i].x + this.vertices[i].y + this.vertices[0].x + this.vertices[0].y);
-                edge = hash1 + hash2;
-            }
-
-            this.edges.push(edge);
-
-        }
-
-        console.log(this.calcs);
-        console.log(this.edges);
+        // sets vertices and calculates edges
+        this.setVertices(vertices);
     };
 
 
@@ -135,9 +132,28 @@
         this.edges = [];
 
         // set vertices to points
-        for (var i = 0; i < vertices.length; i++) {
-            this.vertices.push(vertices[i]);
+        for (var i = 0; i < vertices.length; i += 2) {
+            var vertex = new TRAIL.Vertex(vertices[i], vertices[i + 1]);
+            this.vertices.push(vertex);
         }
+
+        // calculate all edges
+        for (var i = 0; i < this.vertices.length; i++) {
+            var hash1, hash2, edge;
+            if (i < this.vertices.length - 1) {
+                hash1 = TRAIL.generateHash(this.vertices[i].x) + TRAIL.generateHash(this.vertices[i].y);
+                hash2 = TRAIL.generateHash(this.vertices[i + 1].x) + TRAIL.generateHash(this.vertices[i + 1].y);
+                edge = hash1 + hash2;
+            } else {
+                hash1 = TRAIL.generateHash(this.vertices[i].x) + TRAIL.generateHash(this.vertices[i].y);
+                hash2 = TRAIL.generateHash(this.vertices[0].x) + TRAIL.generateHash(this.vertices[0].y);
+                edge = hash1 + hash2;
+            }
+
+            this.edges.push(edge);
+        }
+
+        console.log(this.edges);
     };
 
 

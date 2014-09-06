@@ -7,9 +7,20 @@
  */
 TRAIL.Polygon = function(vertices)
 {
-    this.vertices = [];
+	// sets vertices and calculates edges
+	this.setVertices(vertices);
+};
+
+
+/**
+ * Set Polygon by Vertices
+ *
+ * @param vertices {Array} the Vertices to make up the Polygon
+ */
+TRAIL.Polygon.prototype.setVertices = function(vertices)
+{
+	this.vertices = [];
 	this.edges = [];
-	this.calcs = [];
 
 	// set vertices to points
 	for(var i = 0; i < vertices.length; i+=2)
@@ -22,44 +33,22 @@ TRAIL.Polygon = function(vertices)
 	for (var i = 0; i < this.vertices.length; i++)
 	{
 		var hash1, hash2, edge;
-		if(i != this.vertices.length-1)
+		if(i < this.vertices.length-1)
 		{
 			hash1 = TRAIL.generateHash(this.vertices[i].x) + TRAIL.generateHash(this.vertices[i].y);
 			hash2 = TRAIL.generateHash(this.vertices[i + 1].x) + TRAIL.generateHash(this.vertices[i + 1].y);
-			this.calcs.push(this.vertices[i].x + this.vertices[i].y + this.vertices[i+1].x + this.vertices[i+1].y)
 			edge = hash1 + hash2;
 		} else
 		{
-			hash1 = TRAIL.generateHash(this.vertices[this.vertices.length-1].x) + TRAIL.generateHash(this.vertices[0].y);
-			hash2 = TRAIL.generateHash(this.vertices[this.vertices.length-1].x) + TRAIL.generateHash(this.vertices[0].y);
-			this.calcs.push(this.vertices[i].x + this.vertices[i].y + this.vertices[0].x + this.vertices[0].y);
+			hash1 = TRAIL.generateHash(this.vertices[i].x) + TRAIL.generateHash(this.vertices[i].y);
+			hash2 = TRAIL.generateHash(this.vertices[0].x) + TRAIL.generateHash(this.vertices[0].y);
 			edge = hash1 + hash2;
 		}
 
 		this.edges.push(edge);
-
 	}
 
-	console.log(this.calcs);
 	console.log(this.edges);
-};
-
-
-/**
- * Set Polygon by Vertices
- *
- * @param vertices {Array} the Vertices to make up the Polygon
- */
-TRAIL.Polygon.prototype.setVertices = function(vertices)
-{
-    this.vertices = [];
-	this.edges = [];
-
-    // set vertices to points
-    for(var i = 0; i < vertices.length; i++)
-    {
-        this.vertices.push(vertices[i]);
-    }
 };
 
 
