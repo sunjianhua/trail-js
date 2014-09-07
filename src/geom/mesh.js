@@ -56,13 +56,21 @@ TRAIL.Mesh.prototype.addPolygon = function(polygon)
  */
 TRAIL.Mesh.prototype.prepareGraph = function()
 {
-	// iterate over polygons - getting all edges
+	this.edges = [];
+	this.graph = [];
+
+	// iterate over polygons to build the Graph
 	for (var i = 0; i < this.polygons.length; i++)
 	{
 		var polygon = this.polygons[i];
-		var edges = polygon.getEdges();
+		var polygonCenter = polygon.getCentroid();
+
+		// place a node at the center of each Polygon for pathfinding.
+		// this will progress to nodes being placed at edge centers too.
+		var graphNode = new TRAIL.GraphNode(polygonCenter.x, polygonCenter.y);
 
 		// iterate over all edge hashes and placing them in the polygonLink array (using their hash)
+		var edges = polygon.getEdges();
 		for (var j = 0; j < edges.length; j++)
 		{
 			var edge = edges[j];

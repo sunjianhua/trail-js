@@ -95,5 +95,32 @@ TRAIL.Polygon.prototype.setVertex = function(id, vertex)
 };
 
 
+/**
+ * Returns a Vertex that denotes the Polygons centeroid
+ * TODO does this work with concave polygons?
+ * @return {Array} returns an Array of edges
+ */
+TRAIL.Polygon.prototype.getCentroid = function()
+{
+	var twicearea = 0,
+		x=0, y=0,
+		p1, p2, f;
+
+	for(var i = 0, j = this.vertices.length-1; i < this.vertices.length; j = i++)
+	{
+		p1 = this.vertices[i];
+		p2 = this.vertices[j];
+
+		f = p1.x * p2.y - p2.x * p1.y;
+		twicearea += f;
+
+		x += (p1.x + p2.x) * f;
+		y += (p1.y + p2.y) * f;
+	}
+	f = twicearea * 3;
+
+	return new TRAIL.Vertex(x/f, y/f);
+}
+
 // constructor
 TRAIL.Polygon.prototype.constructor = TRAIL.Polygon;

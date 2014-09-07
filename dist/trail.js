@@ -89,12 +89,20 @@
      * @return {Graph} Returns the Graph to be used by A*
      */
     TRAIL.Mesh.prototype.prepareGraph = function () {
-        // iterate over polygons - getting all edges
+        this.edges = [];
+        this.graph = [];
+
+        // iterate over polygons to build the Graph
         for (var i = 0; i < this.polygons.length; i++) {
             var polygon = this.polygons[i];
-            var edges = polygon.getEdges();
+            var polygonCenter = polygon.getCentroid();
+
+            // place a node at the center of each Polygon for pathfinding.
+            // this will progress to nodes being placed at edge centers too.
+            var graphNode = new TRAIL.GraphNode(polygonCenter.x, polygonCenter.y);
 
             // iterate over all edge hashes and placing them in the polygonLink array (using their hash)
+            var edges = polygon.getEdges();
             for (var j = 0; j < edges.length; j++) {
                 var edge = edges[j];
                 if (this.polygonLinks[edge] == undefined) {
@@ -195,6 +203,32 @@
         this.vertices[id] = vertex;
     };
 
+
+    /**
+     * Returns a Vertex that denotes the Polygons centeroid
+     * TODO does this work with concave polygons?
+     * @return {Array} returns an Array of edges
+     */
+    TRAIL.Polygon.prototype.getCentroid = function () {
+        var twicearea = 0,
+            x = 0,
+            y = 0,
+            p1, p2, f;
+
+        for (var i = 0, j = this.vertices.length - 1; i < this.vertices.length; j = i++) {
+            p1 = this.vertices[i];
+            p2 = this.vertices[j];
+
+            f = p1.x * p2.y - p2.x * p1.y;
+            twicearea += f;
+
+            x += (p1.x + p2.x) * f;
+            y += (p1.y + p2.y) * f;
+        }
+        f = twicearea * 3;
+
+        return new TRAIL.Vertex(x / f, y / f);
+    }
 
     // constructor
     TRAIL.Polygon.prototype.constructor = TRAIL.Polygon;
@@ -766,15 +800,21 @@
     TRAIL.Graph.prototype.constructor = TRAIL.Graph;
     /**
      * This GraphNode is used in the A* Navigation
+     *
      * A Graph has multiple GraphNodes.
+     *
      * The GraphNodes are used as paths and as such have a reference
      * to other connected GraphNodes.
      *
      * @class GraphNode
      * @constructor
+     * @param x {Integer} the x position of the Vertex
+     * @param y {Integer} the y position of the Vertex
      */
-    TRAIL.GraphNode = function () {
-
+    TRAIL.GraphNode = function (x, y) {
+        this.x = x;
+        this.y = y;
+        this.connectedGraphNodes = [];
     };
 
 
