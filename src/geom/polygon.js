@@ -23,26 +23,22 @@ TRAIL.Polygon.prototype.setVertices = function(vertices)
 	this.edges = [];
 
 	// set vertices to points
-	for(var i = 0; i < vertices.length; i+=2)
+	for(var i = 0; i < vertices.length; i += 2)
 	{
-		var vertex = new TRAIL.Vertex(vertices[i], vertices[i+1]);
+		var vertex = new TRAIL.Vertex(vertices[i], vertices[i + 1]);
 		this.vertices.push(vertex);
 	}
 
 	// calculate all edges
-	for (var i = 0; i < this.vertices.length; i++)
+	for(var i = 0; i < this.vertices.length; i++)
 	{
 		var hash1, hash2, edge;
-		if(i < this.vertices.length-1)
+		if(i < this.vertices.length - 1)
 		{
-			hash1 = TRAIL.generateHash(this.vertices[i].x) + TRAIL.generateHash(this.vertices[i].y);
-			hash2 = TRAIL.generateHash(this.vertices[i + 1].x) + TRAIL.generateHash(this.vertices[i + 1].y);
-			edge = hash1 + hash2;
+			edge = new TRAIL.Edge(this.vertices[i], this.vertices[i + 1], this);
 		} else
 		{
-			hash1 = TRAIL.generateHash(this.vertices[i].x) + TRAIL.generateHash(this.vertices[i].y);
-			hash2 = TRAIL.generateHash(this.vertices[0].x) + TRAIL.generateHash(this.vertices[0].y);
-			edge = hash1 + hash2;
+			edge = new TRAIL.Edge(this.vertices[i], this.vertices[0], this);
 		}
 
 		this.edges.push(edge);
@@ -57,7 +53,7 @@ TRAIL.Polygon.prototype.setVertices = function(vertices)
  */
 TRAIL.Polygon.prototype.getVertices = function()
 {
-    return this.vertices;
+	return this.vertices;
 };
 
 
@@ -103,10 +99,10 @@ TRAIL.Polygon.prototype.setVertex = function(id, vertex)
 TRAIL.Polygon.prototype.getCentroid = function()
 {
 	var twicearea = 0,
-		x=0, y=0,
+		x = 0, y = 0,
 		p1, p2, f;
 
-	for(var i = 0, j = this.vertices.length-1; i < this.vertices.length; j = i++)
+	for(var i = 0, j = this.vertices.length - 1; i < this.vertices.length; j = i++)
 	{
 		p1 = this.vertices[i];
 		p2 = this.vertices[j];
@@ -119,7 +115,7 @@ TRAIL.Polygon.prototype.getCentroid = function()
 	}
 	f = twicearea * 3;
 
-	return new TRAIL.Vertex(x/f, y/f);
+	return new TRAIL.Vertex(x / f, y / f);
 }
 
 // constructor

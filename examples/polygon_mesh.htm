@@ -1,27 +1,28 @@
 <html>
-    <head>
-        <title>Trail - Examples</title>
+<head>
+    <title>Trail - Examples</title>
 
-        <!-- app -->
-        <script type="text/javascript" src="js/trail.min.js"></script>
+    <!-- app -->
+    <script type="text/javascript" src="js/trail.min.js"></script>
 
-        <!-- css linkage -->
-        <link rel="stylesheet" type="text/css" href="css/trail.css" />
-    </head>
-    <body>
-    <h1>Trail.js Examples</h1>
-    <h2>Polygon Mesh</h2>
-    <p><b>Overview</b><br />Rough test of pure polygon in a test scene.</p>
-    <p><a href="/">... back to examples</a></p>
-    <canvas id="canvas" width="640" height="430" style="border:1px solid">
+    <!-- css linkage -->
+    <link rel="stylesheet" type="text/css" href="css/trail.css"/>
+</head>
+<body>
+<h1>Trail.js Examples</h1>
+
+<h2>Polygon Mesh</h2>
+
+<p><b>Overview</b><br/>Rough test of pure polygon in a test scene.</p>
+
+<p><a href="/">... back to examples</a></p>
+<canvas id="canvas" width="640" height="430" style="border:1px solid">
 
     <!-- on ready -->
     <script type="text/javascript">
         window.onload = function()
         {
             console.log("Document* Ready");
-
-
 
 
             // TODO these 'should' be abstracted to a utility class in the examples/js folder
@@ -40,20 +41,22 @@
                 ctx.closePath();
                 ctx.fill();
             }
+
             function drawVertices(mesh)
             {
                 var polygons = mesh.getPolygons();
-                for (var i = 0; i < polygons.length; i++)
+                for(var i = 0; i < polygons.length; i++)
                 {
                     var polygon = polygons[i];
                     var vertices = polygon.getVertices();
-                    for (var j = 0; j < vertices.length; j++)
+                    for(var j = 0; j < vertices.length; j++)
                     {
                         var vertex = vertices[j];
                         drawVertex(vertex);
                     }
                 }
             }
+
             function drawPolygons(mesh)
             {
                 var polygons = mesh.getPolygons();
@@ -71,7 +74,8 @@
                     ctx.moveTo(vertices[0].x, vertices[0].y);
 
                     // draw each vertex
-                    for (var j = 0; j < vertices.length; j++) {
+                    for(var j = 0; j < vertices.length; j++)
+                    {
                         ctx.lineTo(vertices[j].x, vertices[j].y);
                     }
 
@@ -82,28 +86,59 @@
             }
 
 
+            function drawGraph(graph)
+            {
+                // iterate graph and draw connections
+                for(var i = 0; i < graph.length; i++)
+                {
+                    var node = graph[i];
 
+                    // draw connections
+                    for(var j = 0; j < node.connectedGraphNodes.length; j++)
+                    {
+                        // draw each path
+                        ctx.strokeStyle = "rgba(255, 255, 255, 1)";
+                        ctx.beginPath();
+                        ctx.moveTo(node.x, node.y);
+                        ctx.lineTo(node.connectedGraphNodes[j].x, node.connectedGraphNodes[j].y);
+                        ctx.closePath();
+                        ctx.stroke();
+                    }
+                }
 
+                // iterate graph and draw nodes
+                for(var i = 0; i < graph.length; i++)
+                {
+                    var node = graph[i];
+
+                    // draw node
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, 6, 0, 2 * Math.PI, false);
+                    ctx.fillStyle = "rgba(255, 0, 255, 1)";
+                    ctx.closePath();
+                    ctx.fill();
+                }
+            }
 
 
             // MOUSE CLICK DETECTION
-            function getMousePos(canvas, evt) {
+            function getMousePos(canvas, evt)
+            {
                 var rect = canvas.getBoundingClientRect();
                 return {
                     x: (evt.clientX - rect.left).toFixed(0),
                     y: (evt.clientY - rect.top).toFixed(0)
                 };
             }
-            canvas.addEventListener('mousedown', function(evt) {
+
+            canvas.addEventListener('mousedown', function(evt)
+            {
                 var mousePos = getMousePos(canvas, evt);
                 var message = mousePos.x + ',' + mousePos.y + ", ";
                 console.log(message);
             }, false);
 
             // -----------
-
-
-
 
 
             var img = new Image();
@@ -118,25 +153,26 @@
                 var mesh = new TRAIL.Mesh();
 
                 // add some Polygons by hand
-                mesh.addPolygon(new TRAIL.Polygon([45,134, 122,51, 182,138, 138,179]));
-                mesh.addPolygon(new TRAIL.Polygon([122,51, 206,19, 232,107, 182,138]));
-                mesh.addPolygon(new TRAIL.Polygon([206,19, 303,10, 304,101, 232,107]));
-                mesh.addPolygon(new TRAIL.Polygon([303,10, 378,32, 377,115, 304,101]));
-                mesh.addPolygon(new TRAIL.Polygon([378,32, 441,61, 442,147, 377,115]));
-                mesh.addPolygon(new TRAIL.Polygon([441,61, 547,61, 547,147, 441,147]));
-                mesh.addPolygon(new TRAIL.Polygon([441,147, 547,147, 547,255, 441,255]));
-                mesh.addPolygon(new TRAIL.Polygon([441,255, 547,255, 547,362, 441,362]));
-
-                // prepares a Graph for an A* Agent to use
-                mesh.prepareGraph();
+                mesh.addPolygon(new TRAIL.Polygon([45, 134, 122, 51, 182, 138, 138, 179]));
+                mesh.addPolygon(new TRAIL.Polygon([122, 51, 206, 19, 232, 107, 182, 138]));
+                mesh.addPolygon(new TRAIL.Polygon([206, 19, 303, 10, 304, 101, 232, 107]));
+                mesh.addPolygon(new TRAIL.Polygon([303, 10, 378, 32, 377, 115, 304, 101]));
+                mesh.addPolygon(new TRAIL.Polygon([378, 32, 441, 61, 441, 147, 377, 115]));
+                mesh.addPolygon(new TRAIL.Polygon([441, 61, 547, 61, 547, 147, 441, 147]));
+                mesh.addPolygon(new TRAIL.Polygon([441, 147, 547, 147, 547, 255, 441, 255]));
+                mesh.addPolygon(new TRAIL.Polygon([441, 255, 547, 255, 547, 362, 441, 362]));
 
                 // render mesh
                 drawPolygons(mesh);
                 drawVertices(mesh);
 
+                // prepares a Graph for an A* Agent to use
+                mesh.prepareGraph();
+                drawGraph(mesh.graph);
+
             }
             img.src = "img/navmesh-wip.png";
         }
     </script>
-    </body>
+</body>
 </html>

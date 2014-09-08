@@ -37,6 +37,44 @@
  [2/09/2014 5:19:36 pm] Stephen Woolcock: i think i had an AS3 function that did tha
  */
     /**
+     * This class is an Edge implementation.
+     * Edges make up the boundaries of Polygons using two Vertices.
+     * Edges also contain a reference to the Vertex objects and the parent Polygon and are used to make up a Graph.
+     *
+     * @class Edge
+     * @constructor
+     * @param vertex1 {Vertex} the first vertex
+     * @param vertex2 {Vertex} the second vertex
+     * @param polygon {Polygon} the polygon parent
+     */
+    TRAIL.Edge = function (vertex1, vertex2, polygon) {
+        // calculate hash (for easy detection of shared edges by the polygons)
+        var hash1 = TRAIL.generateHash(vertex1.x) + TRAIL.generateHash(vertex1.y);
+        var hash2 = TRAIL.generateHash(vertex2.x) + TRAIL.generateHash(vertex2.y);
+        var hash = hash1 + hash2;
+
+        // set properties
+        this.vertex1 = vertex1;
+        this.vertex2 = vertex2;
+        this.polygon = polygon;
+        this.hash = hash;
+    };
+
+
+    /**
+     * Get hash.
+     *
+     * @return {Integer} returns the hash for lookup operations / linking Polygons in the Mesh
+     */
+    TRAIL.Edge.prototype.getHash = function () {
+        return this.hash;
+    };
+
+
+    // constructor
+    TRAIL.Edge.prototype.constructor = TRAIL.Edge;
+
+    /**
      * This class is a container for all mesh related functionality.
      * Meshes contain n amount of Polygons.
      * Polygons contain n amount of Vertex objects.
@@ -91,26 +129,71 @@
     TRAIL.Mesh.prototype.prepareGraph = function () {
         this.edges = [];
         this.graph = [];
+        this.polygonLinks = [];
 
-        // iterate over polygons to build the Graph
+        // iterate over polygons to build the Edges - Edges need to be collected before building the graph nodes
         for (var i = 0; i < this.polygons.length; i++) {
             var polygon = this.polygons[i];
-            var polygonCenter = polygon.getCentroid();
-
-            // place a node at the center of each Polygon for pathfinding.
-            // this will progress to nodes being placed at edge centers too.
-            var graphNode = new TRAIL.GraphNode(polygonCenter.x, polygonCenter.y);
-
-            // iterate over all edge hashes and placing them in the polygonLink array (using their hash)
             var edges = polygon.getEdges();
             for (var j = 0; j < edges.length; j++) {
                 var edge = edges[j];
-                if (this.polygonLinks[edge] == undefined) {
-                    this.polygonLinks[edge] = [polygon];
+                var hash = edge.getHash();
+
+                // create one element arrays as standard - otherwise push in to the array if more than one item already exists
+                if (this.polygonLinks[hash] == undefined) {
+                    this.polygonLinks[hash] = [edge];
                 } else {
-                    this.polygonLinks[edge].push(polygon);
+                    this.polygonLinks[hash].push(edge);
                 }
             }
+        }
+
+
+
+
+
+
+
+        // iterate over all edge hashes and building the graph nodes at polygon centers
+        // linking polygons where n amount of polygons have an edge.
+        // e.g. graph nodes at center of polygon 1 and 2. polygon 1 and 2 share an edge (hashed) so we link their graphnodes.
+        for (var i = 0; i < this.polygons.length; i++) {
+            var polygon = this.polygons[i];
+            var center = polygon.getCentroid();
+            var graphNode = new TRAIL.GraphNode(center.x, center.y);
+            this.graph.push(graphNode);
+        }
+
+        // TODO this is creating too many graphnodes
+        //	for(edges in this.polygonLinks)
+        //	{
+        //		if(this.polygonLinks[edges].length > 1)
+        //		{
+        //			// TODO need connecting Polygons to link the graphnodes
+        //			for(var i = 0; i < this.polygonLinks[edges].length; i++)
+        //			{
+        //				var edge = this.polygonLinks[edges][i];
+        //				var center = edge.polygon.getCentroid();
+        //
+        //				// create a graphnode and link to all other polys sharing the edge
+        //				var graphNode = new TRAIL.GraphNode(center.x, center.y);
+        //				for(var j = 0; j < this.polygonLinks[edges].length; j++)
+        //				{
+        //					if(j != i)
+        //					{
+        //						graphNode.connectedGraphNodes.push(this.polygonLinks[edges][j].polygon);
+        //					}
+        //				}
+        //				this.graph.push(graphNode);
+        //			}
+        //		}
+        //	}
+        this.graph[0].connectedGraphNodes[0] = this.graph[1];
+
+        console.log("created: " + this.graph.length + " graphnodes");
+        for (var i = 0; i < this.graph.length; i++) {
+            var graphNode = this.graph[i];
+            console.log("graphnode " + i + " has " + graphNode.connectedGraphNodes.length + " connections");
         }
     }
 
@@ -149,13 +232,9 @@
         for (var i = 0; i < this.vertices.length; i++) {
             var hash1, hash2, edge;
             if (i < this.vertices.length - 1) {
-                hash1 = TRAIL.generateHash(this.vertices[i].x) + TRAIL.generateHash(this.vertices[i].y);
-                hash2 = TRAIL.generateHash(this.vertices[i + 1].x) + TRAIL.generateHash(this.vertices[i + 1].y);
-                edge = hash1 + hash2;
+                edge = new TRAIL.Edge(this.vertices[i], this.vertices[i + 1], this);
             } else {
-                hash1 = TRAIL.generateHash(this.vertices[i].x) + TRAIL.generateHash(this.vertices[i].y);
-                hash2 = TRAIL.generateHash(this.vertices[0].x) + TRAIL.generateHash(this.vertices[0].y);
-                edge = hash1 + hash2;
+                edge = new TRAIL.Edge(this.vertices[i], this.vertices[0], this);
             }
 
             this.edges.push(edge);
