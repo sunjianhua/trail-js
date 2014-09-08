@@ -82,23 +82,6 @@ TRAIL.Mesh.prototype.prepareGraph = function()
 	}
 
 
-
-
-
-
-
-	// iterate over all edge hashes and building the graph nodes at polygon centers
-	// linking polygons where n amount of polygons have an edge.
-	// e.g. graph nodes at center of polygon 1 and 2. polygon 1 and 2 share an edge (hashed) so we link their graphnodes.
-
-	for(var i = 0; i < this.polygons.length; i++)
-	{
-		var polygon = this.polygons[i];
-		var center = polygon.getCentroid();
-		var graphNode = new TRAIL.GraphNode(center.x, center.y);
-		this.graph.push(graphNode);
-	}
-
 	// TODO this is creating too many graphnodes
 //	for(edges in this.polygonLinks)
 //	{
@@ -124,8 +107,25 @@ TRAIL.Mesh.prototype.prepareGraph = function()
 //		}
 //	}
 
+	// iterate over all edge hashes and building the graph nodes at polygon centers
+	// linking polygons where n amount of polygons have an edge.
+	// e.g. graph nodes at center of polygon 1 and 2. polygon 1 and 2 share an edge (hashed) so we link their graphnodes.
+	for(var i = 0; i < this.polygons.length; i++)
+	{
+		var polygon = this.polygons[i];
+		var center = polygon.getCenter();
+		var graphNode = new TRAIL.GraphNode(center.x, center.y);
+		this.graph.push(graphNode);
+
+		// do i iterate each polygonlink/edge here comparing against this polygon and adding the shared edge? kinda, bruteforcey :(
+		// is there a better approach (almost certainly)
+	}
+
+	// manually force a link for debugging
+	// TODO remove this shizzle
 	this.graph[0].connectedGraphNodes[0]=this.graph[1];
 
+	// verbose output for debugging
 	console.log("created: " + this.graph.length + " graphnodes");
 	for(var i = 0; i < this.graph.length; i++)
 	{

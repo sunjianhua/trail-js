@@ -149,21 +149,6 @@
         }
 
 
-
-
-
-
-
-        // iterate over all edge hashes and building the graph nodes at polygon centers
-        // linking polygons where n amount of polygons have an edge.
-        // e.g. graph nodes at center of polygon 1 and 2. polygon 1 and 2 share an edge (hashed) so we link their graphnodes.
-        for (var i = 0; i < this.polygons.length; i++) {
-            var polygon = this.polygons[i];
-            var center = polygon.getCentroid();
-            var graphNode = new TRAIL.GraphNode(center.x, center.y);
-            this.graph.push(graphNode);
-        }
-
         // TODO this is creating too many graphnodes
         //	for(edges in this.polygonLinks)
         //	{
@@ -188,8 +173,24 @@
         //			}
         //		}
         //	}
+        // iterate over all edge hashes and building the graph nodes at polygon centers
+        // linking polygons where n amount of polygons have an edge.
+        // e.g. graph nodes at center of polygon 1 and 2. polygon 1 and 2 share an edge (hashed) so we link their graphnodes.
+        for (var i = 0; i < this.polygons.length; i++) {
+            var polygon = this.polygons[i];
+            var center = polygon.getCenter();
+            var graphNode = new TRAIL.GraphNode(center.x, center.y);
+            this.graph.push(graphNode);
+
+            // do i iterate each polygonlink/edge here comparing against this polygon and adding the shared edge? kinda, bruteforcey :(
+            // is there a better approach (almost certainly)
+        }
+
+        // manually force a link for debugging
+        // TODO remove this shizzle
         this.graph[0].connectedGraphNodes[0] = this.graph[1];
 
+        // verbose output for debugging
         console.log("created: " + this.graph.length + " graphnodes");
         for (var i = 0; i < this.graph.length; i++) {
             var graphNode = this.graph[i];
@@ -286,9 +287,9 @@
     /**
      * Returns a Vertex that denotes the Polygons centeroid
      * TODO does this work with concave polygons?
-     * @return {Array} returns an Array of edges
+     * @return {Vertex} returns a Vertex with the Polygons center xy
      */
-    TRAIL.Polygon.prototype.getCentroid = function () {
+    TRAIL.Polygon.prototype.getCenter = function () {
         var twicearea = 0,
             x = 0,
             y = 0,
