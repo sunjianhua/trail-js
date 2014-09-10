@@ -19,7 +19,8 @@ TRAIL.Edge = function(vertex1, vertex2, polygon)
 	// set properties
 	this.vertex1 = vertex1;
 	this.vertex2 = vertex2;
-	this.polygon = polygon;
+	this.polygon1 = polygon;
+	this.polygon2 = null;
 	this.hash = hash;
 };
 

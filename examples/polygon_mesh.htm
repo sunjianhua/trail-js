@@ -156,14 +156,21 @@
                 var mesh = new TRAIL.Mesh();
 
                 // add some Polygons by hand
-                mesh.addPolygon(new TRAIL.Polygon([45, 134, 122, 51, 182, 138, 138, 179]));
-                mesh.addPolygon(new TRAIL.Polygon([122, 51, 206, 19, 232, 107, 182, 138]));
-                mesh.addPolygon(new TRAIL.Polygon([206, 19, 303, 10, 304, 101, 232, 107]));
-                mesh.addPolygon(new TRAIL.Polygon([303, 10, 378, 32, 377, 115, 304, 101]));
-                mesh.addPolygon(new TRAIL.Polygon([378, 32, 441, 61, 441, 147, 377, 115]));
-                mesh.addPolygon(new TRAIL.Polygon([441, 61, 547, 61, 547, 147, 441, 147]));
-                mesh.addPolygon(new TRAIL.Polygon([441, 147, 547, 147, 547, 255, 441, 255]));
-                mesh.addPolygon(new TRAIL.Polygon([441, 255, 547, 255, 547, 362, 441, 362]));
+                mesh.addPolygon(new TRAIL.Polygon([45,134, 122,51, 182,138, 138,179]));
+                mesh.addPolygon(new TRAIL.Polygon([122,51, 206,19, 232,107, 182,138]));
+                mesh.addPolygon(new TRAIL.Polygon([206,19, 303,10, 304,101, 232,107]));
+                mesh.addPolygon(new TRAIL.Polygon([303,10, 378,32, 377,115, 304,101]));
+                mesh.addPolygon(new TRAIL.Polygon([378,32, 441,61, 441,155, 377,115]));
+                mesh.addPolygon(new TRAIL.Polygon([441,61, 547,61, 547,155, 441,155]));
+                mesh.addPolygon(new TRAIL.Polygon([441,155, 547,155, 547,260, 441,260]));
+                mesh.addPolygon(new TRAIL.Polygon([547,155, 630,155, 630,260, 547,260]));
+                mesh.addPolygon(new TRAIL.Polygon([441,260, 547,260, 547,362, 441,362]));
+                mesh.addPolygon(new TRAIL.Polygon([364,300, 441,260, 441,362, 364,402]));
+
+
+                // try toggling these to see the graph adjust :]
+                mesh.addPolygon(new TRAIL.Polygon([304,101, 232,107, 232,207, 304,201]));
+                mesh.addPolygon(new TRAIL.Polygon([232,207, 304,201, 304,301, 232,307]));
 
                 // render mesh
                 drawPolygons(mesh);
@@ -173,7 +180,7 @@
                 mesh.prepareGraph();
                 drawGraph(mesh.graph);
 
-            }
+            };
             img.src = "img/navmesh-wip.png";
         }
     </script>

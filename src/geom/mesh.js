@@ -60,6 +60,7 @@ TRAIL.Mesh.prototype.prepareGraph = function()
 	this.graph = [];
 	this.polygonLinks = [];
 
+	// STEP 1
 	// iterate over polygons to build the Edges - Edges need to be collected before building the graph nodes
 	for(var i = 0; i < this.polygons.length; i++)
 	{
@@ -81,56 +82,48 @@ TRAIL.Mesh.prototype.prepareGraph = function()
 		}
 	}
 
-
-	// TODO this is creating too many graphnodes
-//	for(edges in this.polygonLinks)
-//	{
-//		if(this.polygonLinks[edges].length > 1)
-//		{
-//			// TODO need connecting Polygons to link the graphnodes
-//			for(var i = 0; i < this.polygonLinks[edges].length; i++)
-//			{
-//				var edge = this.polygonLinks[edges][i];
-//				var center = edge.polygon.getCentroid();
-//
-//				// create a graphnode and link to all other polys sharing the edge
-//				var graphNode = new TRAIL.GraphNode(center.x, center.y);
-//				for(var j = 0; j < this.polygonLinks[edges].length; j++)
-//				{
-//					if(j != i)
-//					{
-//						graphNode.connectedGraphNodes.push(this.polygonLinks[edges][j].polygon);
-//					}
-//				}
-//				this.graph.push(graphNode);
-//			}
-//		}
-//	}
-
-	// iterate over all edge hashes and building the graph nodes at polygon centers
-	// linking polygons where n amount of polygons have an edge.
-	// e.g. graph nodes at center of polygon 1 and 2. polygon 1 and 2 share an edge (hashed) so we link their graphnodes.
-	for(var i = 0; i < this.polygons.length; i++)
+	// STEP 2
+	// here we iterate the hashed edges, reverse linking the missing polygons in the edge objects
+	var edgeID;
+	var hashedNodes = [];
+	for(edgeID in this.polygonLinks)
 	{
-		var polygon = this.polygons[i];
-		var center = polygon.getCenter();
-		var graphNode = new TRAIL.GraphNode(center.x, center.y);
-		this.graph.push(graphNode);
+		if(this.polygonLinks[edgeID].length > 1)
+		{
+			// set each edges second polygon - for easy reference when creating the graph nodes
+			this.polygonLinks[edgeID][0].polygon2 = this.polygonLinks[edgeID][1].polygon1;
+			this.polygonLinks[edgeID][1].polygon2 = this.polygonLinks[edgeID][0].polygon1;
 
-		// do i iterate each polygonlink/edge here comparing against this polygon and adding the shared edge? kinda, bruteforcey :(
-		// is there a better approach (almost certainly)
-	}
 
-	// manually force a link for debugging
-	// TODO remove this shizzle
-	this.graph[0].connectedGraphNodes[0]=this.graph[1];
+			// TODO this needs tidying but essentially works!
+				// gets or creates a unique graphnode
+				var graphNode1;
+				var hash1 = TRAIL.generateHash(this.polygonLinks[edgeID][0].polygon1.x) + TRAIL.generateHash(this.polygonLinks[edgeID][0].polygon1.y);
+				if(hashedNodes[hash1] != undefined)
+				{
+					graphNode1 = hashedNodes[hash1];
+				} else
+				{
+					var center1 = this.polygonLinks[edgeID][0].polygon1.getCenter();
+					graphNode1 = new TRAIL.GraphNode(center1.x, center1.y);
+					this.graph.push(graphNode1);
+				}
 
-	// verbose output for debugging
-	console.log("created: " + this.graph.length + " graphnodes");
-	for(var i = 0; i < this.graph.length; i++)
-	{
-		var graphNode = this.graph[i];
-		console.log("graphnode " + i + " has " + graphNode.connectedGraphNodes.length + " connections");
+				var graphNode2;
+				var hash2 = TRAIL.generateHash(this.polygonLinks[edgeID][1].polygon1.x) + TRAIL.generateHash(this.polygonLinks[edgeID][1].polygon1.y);
+				if(hashedNodes[hash2] != undefined)
+				{
+					graphNode2 = hashedNodes[hash2];
+				} else
+				{
+					var center2 = this.polygonLinks[edgeID][1].polygon1.getCenter();
+					graphNode2 = new TRAIL.GraphNode(center2.x, center2.y);
+					this.graph.push(graphNode2);
+				}
+
+				graphNode1.connectedGraphNodes.push(graphNode2);
+				graphNode2.connectedGraphNodes.push(graphNode1);
+		}
 	}
 }
 
