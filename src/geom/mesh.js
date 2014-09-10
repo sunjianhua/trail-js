@@ -9,8 +9,6 @@
 TRAIL.Mesh = function()
 {
 	this.polygons = [];
-	this.polygonLinks = [];
-	this.graph = null;
 };
 
 
@@ -56,9 +54,9 @@ TRAIL.Mesh.prototype.addPolygon = function(polygon)
  */
 TRAIL.Mesh.prototype.prepareGraph = function()
 {
-	this.edges = [];
-	this.graph = [];
-	this.polygonLinks = [];
+	var edges = [];
+	var graph = [];
+	var polygonLinks = [];
 
 	// STEP 1
 	// iterate over polygons to build the Edges - Edges need to be collected before building the graph nodes
@@ -72,12 +70,12 @@ TRAIL.Mesh.prototype.prepareGraph = function()
 			var hash = edge.getHash();
 
 			// create one element arrays as standard - otherwise push in to the array if more than one item already exists
-			if(this.polygonLinks[hash] == undefined)
+			if(polygonLinks[hash] == undefined)
 			{
-				this.polygonLinks[hash] = [edge];
+				polygonLinks[hash] = [edge];
 			} else
 			{
-				this.polygonLinks[hash].push(edge);
+				polygonLinks[hash].push(edge);
 			}
 		}
 	}
@@ -86,45 +84,47 @@ TRAIL.Mesh.prototype.prepareGraph = function()
 	// here we iterate the hashed edges, reverse linking the missing polygons in the edge objects
 	var edgeID;
 	var hashedNodes = [];
-	for(edgeID in this.polygonLinks)
+	for(edgeID in polygonLinks)
 	{
-		if(this.polygonLinks[edgeID].length > 1)
+		if(polygonLinks[edgeID].length > 1)
 		{
 			// set each edges second polygon - for easy reference when creating the graph nodes
-			this.polygonLinks[edgeID][0].polygon2 = this.polygonLinks[edgeID][1].polygon1;
-			this.polygonLinks[edgeID][1].polygon2 = this.polygonLinks[edgeID][0].polygon1;
+			polygonLinks[edgeID][0].polygon2 = polygonLinks[edgeID][1].polygon1;
+			polygonLinks[edgeID][1].polygon2 = polygonLinks[edgeID][0].polygon1;
 
 
 			// TODO this needs tidying but essentially works!
 				// gets or creates a unique graphnode
 				var graphNode1;
-				var hash1 = TRAIL.generateHash(this.polygonLinks[edgeID][0].polygon1.x) + TRAIL.generateHash(this.polygonLinks[edgeID][0].polygon1.y);
+				var hash1 = TRAIL.generateHash(polygonLinks[edgeID][0].polygon1.x) + TRAIL.generateHash(polygonLinks[edgeID][0].polygon1.y);
 				if(hashedNodes[hash1] != undefined)
 				{
 					graphNode1 = hashedNodes[hash1];
 				} else
 				{
-					var center1 = this.polygonLinks[edgeID][0].polygon1.getCenter();
+					var center1 = polygonLinks[edgeID][0].polygon1.getCenter();
 					graphNode1 = new TRAIL.GraphNode(center1.x, center1.y);
-					this.graph.push(graphNode1);
+					graph.push(graphNode1);
 				}
 
 				var graphNode2;
-				var hash2 = TRAIL.generateHash(this.polygonLinks[edgeID][1].polygon1.x) + TRAIL.generateHash(this.polygonLinks[edgeID][1].polygon1.y);
+				var hash2 = TRAIL.generateHash(polygonLinks[edgeID][1].polygon1.x) + TRAIL.generateHash(polygonLinks[edgeID][1].polygon1.y);
 				if(hashedNodes[hash2] != undefined)
 				{
 					graphNode2 = hashedNodes[hash2];
 				} else
 				{
-					var center2 = this.polygonLinks[edgeID][1].polygon1.getCenter();
+					var center2 = polygonLinks[edgeID][1].polygon1.getCenter();
 					graphNode2 = new TRAIL.GraphNode(center2.x, center2.y);
-					this.graph.push(graphNode2);
+					graph.push(graphNode2);
 				}
 
 				graphNode1.connectedGraphNodes.push(graphNode2);
 				graphNode2.connectedGraphNodes.push(graphNode1);
 		}
 	}
+
+	return graph;
 }
 
 

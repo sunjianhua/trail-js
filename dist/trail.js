@@ -36,6 +36,289 @@
  [2/09/2014 5:19:23 pm] Stephen Woolcock: assuming they don't get too large and overflow :D
  [2/09/2014 5:19:36 pm] Stephen Woolcock: i think i had an AS3 function that did tha
  */
+    /**
+     * This class is an Edge implementation.
+     * Edges make up the boundaries of Polygons using two Vertices.
+     * Edges also contain a reference to the Vertex objects and the parent Polygon and are used to make up a Graph.
+     *
+     * @class Edge
+     * @constructor
+     * @param vertex1 {Vertex} the first vertex
+     * @param vertex2 {Vertex} the second vertex
+     * @param polygon {Polygon} the polygon parent
+     */
+    TRAIL.Edge = function (vertex1, vertex2, polygon) {
+        // calculate hash (for easy detection of shared edges by the polygons)
+        var hash1 = TRAIL.generateHash(vertex1.x) + TRAIL.generateHash(vertex1.y);
+        var hash2 = TRAIL.generateHash(vertex2.x) + TRAIL.generateHash(vertex2.y);
+        var hash = hash1 + hash2;
+
+        // set properties
+        this.vertex1 = vertex1;
+        this.vertex2 = vertex2;
+        this.polygon1 = polygon;
+        this.polygon2 = null;
+        this.hash = hash;
+    };
+
+
+    /**
+     * Get hash.
+     *
+     * @return {Integer} returns the hash for lookup operations / linking Polygons in the Mesh
+     */
+    TRAIL.Edge.prototype.getHash = function () {
+        return this.hash;
+    };
+
+
+    // constructor
+    TRAIL.Edge.prototype.constructor = TRAIL.Edge;
+
+    /**
+     * This class is a container for all mesh related functionality.
+     * Meshes contain n amount of Polygons.
+     * Polygons contain n amount of Vertex objects.
+     *
+     * @class Mesh
+     * @constructor
+     */
+    TRAIL.Mesh = function () {
+        this.polygons = [];
+    };
+
+
+    /**
+     * Returns all Polygons in an Array
+     *
+     * @return {Array} Array of Polygons
+     */
+    TRAIL.Mesh.prototype.getPolygons = function () {
+        return this.polygons;
+    };
+
+
+    /**
+     * Returns a single Polygon by id, the id
+     * is it's location in the Array - not very user friendly atm
+     *
+     * @return {Polygon} Polygon
+     */
+    TRAIL.Mesh.prototype.getPolygon = function (id) {
+        return this.polygons[id];
+    };
+
+
+    /**
+     * Adds a Polygon object to the Mesh
+     *
+     * @param polygon {Polygon} the Polygon to be added to the Mesh
+     */
+    TRAIL.Mesh.prototype.addPolygon = function (polygon) {
+        this.polygons.push(polygon);
+    }
+
+
+    /**
+     * Prepares the Graph for use by the A* Agent for pathfinding
+     *
+     *
+     * @return {Graph} Returns the Graph to be used by A*
+     */
+    TRAIL.Mesh.prototype.prepareGraph = function () {
+        var edges = [];
+        var graph = [];
+        var polygonLinks = [];
+
+        // STEP 1
+        // iterate over polygons to build the Edges - Edges need to be collected before building the graph nodes
+        for (var i = 0; i < this.polygons.length; i++) {
+            var polygon = this.polygons[i];
+            var edges = polygon.getEdges();
+            for (var j = 0; j < edges.length; j++) {
+                var edge = edges[j];
+                var hash = edge.getHash();
+
+                // create one element arrays as standard - otherwise push in to the array if more than one item already exists
+                if (polygonLinks[hash] == undefined) {
+                    polygonLinks[hash] = [edge];
+                } else {
+                    polygonLinks[hash].push(edge);
+                }
+            }
+        }
+
+        // STEP 2
+        // here we iterate the hashed edges, reverse linking the missing polygons in the edge objects
+        var edgeID;
+        var hashedNodes = [];
+        for (edgeID in polygonLinks) {
+            if (polygonLinks[edgeID].length > 1) {
+                // set each edges second polygon - for easy reference when creating the graph nodes
+                polygonLinks[edgeID][0].polygon2 = polygonLinks[edgeID][1].polygon1;
+                polygonLinks[edgeID][1].polygon2 = polygonLinks[edgeID][0].polygon1;
+
+
+                // TODO this needs tidying but essentially works!
+                // gets or creates a unique graphnode
+                var graphNode1;
+                var hash1 = TRAIL.generateHash(polygonLinks[edgeID][0].polygon1.x) + TRAIL.generateHash(polygonLinks[edgeID][0].polygon1.y);
+                if (hashedNodes[hash1] != undefined) {
+                    graphNode1 = hashedNodes[hash1];
+                } else {
+                    var center1 = polygonLinks[edgeID][0].polygon1.getCenter();
+                    graphNode1 = new TRAIL.GraphNode(center1.x, center1.y);
+                    graph.push(graphNode1);
+                }
+
+                var graphNode2;
+                var hash2 = TRAIL.generateHash(polygonLinks[edgeID][1].polygon1.x) + TRAIL.generateHash(polygonLinks[edgeID][1].polygon1.y);
+                if (hashedNodes[hash2] != undefined) {
+                    graphNode2 = hashedNodes[hash2];
+                } else {
+                    var center2 = polygonLinks[edgeID][1].polygon1.getCenter();
+                    graphNode2 = new TRAIL.GraphNode(center2.x, center2.y);
+                    graph.push(graphNode2);
+                }
+
+                graphNode1.connectedGraphNodes.push(graphNode2);
+                graphNode2.connectedGraphNodes.push(graphNode1);
+            }
+        }
+
+        return graph;
+    }
+
+
+    // constructor
+    TRAIL.Mesh.prototype.constructor = TRAIL.Mesh;
+    /**
+     * This class contains the base for polygon shapes which make up the navmesh
+     *
+     * @class Polygon
+     * @param vertices {Array} the Vertices to make up the Polygon
+     * @constructor
+     */
+    TRAIL.Polygon = function (vertices) {
+        // sets vertices and calculates edges
+        this.setVertices(vertices);
+    };
+
+
+    /**
+     * Set Polygon by Vertices
+     *
+     * @param vertices {Array} the Vertices to make up the Polygon
+     */
+    TRAIL.Polygon.prototype.setVertices = function (vertices) {
+        this.vertices = [];
+        this.edges = [];
+
+        // set vertices to points
+        for (var i = 0; i < vertices.length; i += 2) {
+            var vertex = new TRAIL.Vertex(vertices[i], vertices[i + 1]);
+            this.vertices.push(vertex);
+        }
+
+        // calculate all edges
+        for (var i = 0; i < this.vertices.length; i++) {
+            var hash1, hash2, edge;
+            if (i < this.vertices.length - 1) {
+                edge = new TRAIL.Edge(this.vertices[i], this.vertices[i + 1], this);
+            } else {
+                edge = new TRAIL.Edge(this.vertices[i], this.vertices[0], this);
+            }
+
+            this.edges.push(edge);
+        }
+    };
+
+
+    /**
+     * Get Polygon Vertices
+     *
+     * @return {Array} Array of Vertices
+     */
+    TRAIL.Polygon.prototype.getVertices = function () {
+        return this.vertices;
+    };
+
+
+    /**
+     * Get a specific Vertex
+     *
+     * @return {Vertex} Array of Vertices
+     */
+    TRAIL.Polygon.prototype.getVertex = function (id) {
+        return this.vertices[id];
+    };
+
+
+    /**
+     * Get Polygon edges.
+     *
+     * @return {Array} returns an Array of edges
+     */
+    TRAIL.Polygon.prototype.getEdges = function () {
+        return this.edges;
+    };
+
+
+    /**
+     * Set a specific Vertex
+     *
+     * @param id {integer} id of the Vertex to replace
+     * @param vertex {Vertex} Vertex to be replaced with
+     */
+    TRAIL.Polygon.prototype.setVertex = function (id, vertex) {
+        this.vertices[id] = vertex;
+    };
+
+
+    /**
+     * Returns a Vertex that denotes the Polygons centeroid
+     * TODO does this work with concave polygons?
+     * @return {Vertex} returns a Vertex with the Polygons center xy
+     */
+    TRAIL.Polygon.prototype.getCenter = function () {
+        var twicearea = 0,
+            x = 0,
+            y = 0,
+            p1, p2, f;
+
+        for (var i = 0, j = this.vertices.length - 1; i < this.vertices.length; j = i++) {
+            p1 = this.vertices[i];
+            p2 = this.vertices[j];
+
+            f = p1.x * p2.y - p2.x * p1.y;
+            twicearea += f;
+
+            x += (p1.x + p2.x) * f;
+            y += (p1.y + p2.y) * f;
+        }
+        f = twicearea * 3;
+
+        return new TRAIL.Vertex(x / f, y / f);
+    }
+
+    // constructor
+    TRAIL.Polygon.prototype.constructor = TRAIL.Polygon;
+    /**
+     * This class is a Vertex implementation
+     *
+     * @class Vertex
+     * @constructor
+     * @param x {Integer} the x position of the Vertex
+     * @param y {Integer} the y position of the Vertex
+     */
+    TRAIL.Vertex = function (x, y) {
+        this.x = x;
+        this.y = y;
+    };
+
+
+    // constructor
+    TRAIL.Vertex.prototype.constructor = TRAIL.Vertex;
 /*
  PolyK library
  url: http://polyk.ivank.net
@@ -573,289 +856,6 @@
     PolyK._tp = [];
     for (var i = 0; i < 10; i++) PolyK._tp.push(new PolyK._P(0, 0));
 
-    /**
-     * This class is an Edge implementation.
-     * Edges make up the boundaries of Polygons using two Vertices.
-     * Edges also contain a reference to the Vertex objects and the parent Polygon and are used to make up a Graph.
-     *
-     * @class Edge
-     * @constructor
-     * @param vertex1 {Vertex} the first vertex
-     * @param vertex2 {Vertex} the second vertex
-     * @param polygon {Polygon} the polygon parent
-     */
-    TRAIL.Edge = function (vertex1, vertex2, polygon) {
-        // calculate hash (for easy detection of shared edges by the polygons)
-        var hash1 = TRAIL.generateHash(vertex1.x) + TRAIL.generateHash(vertex1.y);
-        var hash2 = TRAIL.generateHash(vertex2.x) + TRAIL.generateHash(vertex2.y);
-        var hash = hash1 + hash2;
-
-        // set properties
-        this.vertex1 = vertex1;
-        this.vertex2 = vertex2;
-        this.polygon1 = polygon;
-        this.polygon2 = null;
-        this.hash = hash;
-    };
-
-
-    /**
-     * Get hash.
-     *
-     * @return {Integer} returns the hash for lookup operations / linking Polygons in the Mesh
-     */
-    TRAIL.Edge.prototype.getHash = function () {
-        return this.hash;
-    };
-
-
-    // constructor
-    TRAIL.Edge.prototype.constructor = TRAIL.Edge;
-
-    /**
-     * This class is a container for all mesh related functionality.
-     * Meshes contain n amount of Polygons.
-     * Polygons contain n amount of Vertex objects.
-     *
-     * @class Mesh
-     * @constructor
-     */
-    TRAIL.Mesh = function () {
-        this.polygons = [];
-        this.polygonLinks = [];
-        this.graph = null;
-    };
-
-
-    /**
-     * Returns all Polygons in an Array
-     *
-     * @return {Array} Array of Polygons
-     */
-    TRAIL.Mesh.prototype.getPolygons = function () {
-        return this.polygons;
-    };
-
-
-    /**
-     * Returns a single Polygon by id, the id
-     * is it's location in the Array - not very user friendly atm
-     *
-     * @return {Polygon} Polygon
-     */
-    TRAIL.Mesh.prototype.getPolygon = function (id) {
-        return this.polygons[id];
-    };
-
-
-    /**
-     * Adds a Polygon object to the Mesh
-     *
-     * @param polygon {Polygon} the Polygon to be added to the Mesh
-     */
-    TRAIL.Mesh.prototype.addPolygon = function (polygon) {
-        this.polygons.push(polygon);
-    }
-
-
-    /**
-     * Prepares the Graph for use by the A* Agent for pathfinding
-     *
-     *
-     * @return {Graph} Returns the Graph to be used by A*
-     */
-    TRAIL.Mesh.prototype.prepareGraph = function () {
-        this.edges = [];
-        this.graph = [];
-        this.polygonLinks = [];
-
-        // STEP 1
-        // iterate over polygons to build the Edges - Edges need to be collected before building the graph nodes
-        for (var i = 0; i < this.polygons.length; i++) {
-            var polygon = this.polygons[i];
-            var edges = polygon.getEdges();
-            for (var j = 0; j < edges.length; j++) {
-                var edge = edges[j];
-                var hash = edge.getHash();
-
-                // create one element arrays as standard - otherwise push in to the array if more than one item already exists
-                if (this.polygonLinks[hash] == undefined) {
-                    this.polygonLinks[hash] = [edge];
-                } else {
-                    this.polygonLinks[hash].push(edge);
-                }
-            }
-        }
-
-        // STEP 2
-        // here we iterate the hashed edges, reverse linking the missing polygons in the edge objects
-        var edgeID;
-        var hashedNodes = [];
-        for (edgeID in this.polygonLinks) {
-            if (this.polygonLinks[edgeID].length > 1) {
-                // set each edges second polygon - for easy reference when creating the graph nodes
-                this.polygonLinks[edgeID][0].polygon2 = this.polygonLinks[edgeID][1].polygon1;
-                this.polygonLinks[edgeID][1].polygon2 = this.polygonLinks[edgeID][0].polygon1;
-
-
-                // TODO this needs tidying but essentially works!
-                // gets or creates a unique graphnode
-                var graphNode1;
-                var hash1 = TRAIL.generateHash(this.polygonLinks[edgeID][0].polygon1.x) + TRAIL.generateHash(this.polygonLinks[edgeID][0].polygon1.y);
-                if (hashedNodes[hash1] != undefined) {
-                    graphNode1 = hashedNodes[hash1];
-                } else {
-                    var center1 = this.polygonLinks[edgeID][0].polygon1.getCenter();
-                    graphNode1 = new TRAIL.GraphNode(center1.x, center1.y);
-                    this.graph.push(graphNode1);
-                }
-
-                var graphNode2;
-                var hash2 = TRAIL.generateHash(this.polygonLinks[edgeID][1].polygon1.x) + TRAIL.generateHash(this.polygonLinks[edgeID][1].polygon1.y);
-                if (hashedNodes[hash2] != undefined) {
-                    graphNode2 = hashedNodes[hash2];
-                } else {
-                    var center2 = this.polygonLinks[edgeID][1].polygon1.getCenter();
-                    graphNode2 = new TRAIL.GraphNode(center2.x, center2.y);
-                    this.graph.push(graphNode2);
-                }
-
-                graphNode1.connectedGraphNodes.push(graphNode2);
-                graphNode2.connectedGraphNodes.push(graphNode1);
-            }
-        }
-    }
-
-
-    // constructor
-    TRAIL.Mesh.prototype.constructor = TRAIL.Mesh;
-    /**
-     * This class contains the base for polygon shapes which make up the navmesh
-     *
-     * @class Polygon
-     * @param vertices {Array} the Vertices to make up the Polygon
-     * @constructor
-     */
-    TRAIL.Polygon = function (vertices) {
-        // sets vertices and calculates edges
-        this.setVertices(vertices);
-    };
-
-
-    /**
-     * Set Polygon by Vertices
-     *
-     * @param vertices {Array} the Vertices to make up the Polygon
-     */
-    TRAIL.Polygon.prototype.setVertices = function (vertices) {
-        this.vertices = [];
-        this.edges = [];
-
-        // set vertices to points
-        for (var i = 0; i < vertices.length; i += 2) {
-            var vertex = new TRAIL.Vertex(vertices[i], vertices[i + 1]);
-            this.vertices.push(vertex);
-        }
-
-        // calculate all edges
-        for (var i = 0; i < this.vertices.length; i++) {
-            var hash1, hash2, edge;
-            if (i < this.vertices.length - 1) {
-                edge = new TRAIL.Edge(this.vertices[i], this.vertices[i + 1], this);
-            } else {
-                edge = new TRAIL.Edge(this.vertices[i], this.vertices[0], this);
-            }
-
-            this.edges.push(edge);
-        }
-    };
-
-
-    /**
-     * Get Polygon Vertices
-     *
-     * @return {Array} Array of Vertices
-     */
-    TRAIL.Polygon.prototype.getVertices = function () {
-        return this.vertices;
-    };
-
-
-    /**
-     * Get a specific Vertex
-     *
-     * @return {Vertex} Array of Vertices
-     */
-    TRAIL.Polygon.prototype.getVertex = function (id) {
-        return this.vertices[id];
-    };
-
-
-    /**
-     * Get Polygon edges.
-     *
-     * @return {Array} returns an Array of edges
-     */
-    TRAIL.Polygon.prototype.getEdges = function () {
-        return this.edges;
-    };
-
-
-    /**
-     * Set a specific Vertex
-     *
-     * @param id {integer} id of the Vertex to replace
-     * @param vertex {Vertex} Vertex to be replaced with
-     */
-    TRAIL.Polygon.prototype.setVertex = function (id, vertex) {
-        this.vertices[id] = vertex;
-    };
-
-
-    /**
-     * Returns a Vertex that denotes the Polygons centeroid
-     * TODO does this work with concave polygons?
-     * @return {Vertex} returns a Vertex with the Polygons center xy
-     */
-    TRAIL.Polygon.prototype.getCenter = function () {
-        var twicearea = 0,
-            x = 0,
-            y = 0,
-            p1, p2, f;
-
-        for (var i = 0, j = this.vertices.length - 1; i < this.vertices.length; j = i++) {
-            p1 = this.vertices[i];
-            p2 = this.vertices[j];
-
-            f = p1.x * p2.y - p2.x * p1.y;
-            twicearea += f;
-
-            x += (p1.x + p2.x) * f;
-            y += (p1.y + p2.y) * f;
-        }
-        f = twicearea * 3;
-
-        return new TRAIL.Vertex(x / f, y / f);
-    }
-
-    // constructor
-    TRAIL.Polygon.prototype.constructor = TRAIL.Polygon;
-    /**
-     * This class is a Vertex implementation
-     *
-     * @class Vertex
-     * @constructor
-     * @param x {Integer} the x position of the Vertex
-     * @param y {Integer} the y position of the Vertex
-     */
-    TRAIL.Vertex = function (x, y) {
-        this.x = x;
-        this.y = y;
-    };
-
-
-    // constructor
-    TRAIL.Vertex.prototype.constructor = TRAIL.Vertex;
     /**
      * This class makes up the Graph for the A* Navigation
      *

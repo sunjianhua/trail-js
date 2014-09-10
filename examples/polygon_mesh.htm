@@ -177,9 +177,10 @@
                 drawVertices(mesh);
 
                 // prepares a Graph for an A* Agent to use
-                mesh.prepareGraph();
-                drawGraph(mesh.graph);
+                var graph = mesh.prepareGraph();
+                drawGraph(graph);
 
+                graph = null;
             };
             img.src = "img/navmesh-wip.png";
         }
