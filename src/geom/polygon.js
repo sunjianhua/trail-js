@@ -8,6 +8,7 @@
 TRAIL.Polygon = function(vertices)
 {
     this.vertices = [];
+    this.edges = [];
 
     // set vertices to points
     for(var i = 0; i < vertices.length; i += 2)
@@ -29,60 +30,17 @@ TRAIL.Polygon.prototype.getVertices = function()
 
 
 /**
- * Tests if a Polygon is simple in nature (doesn't cross over / intersect itself)
+ * Gets a polygons point by id
  *
- * @return {Boolean} true is a simple Polygon
+ * @return {Point} Point by id
  */
-TRAIL.Polygon.prototype.isSimple = function()
+TRAIL.Polygon.prototype.getPoint = function(id)
 {
-	var vertices = TRAIL.verticesFromPolygon(this);
-    return PolyK.IsSimple(vertices);
+    return this.vertices[id];
 };
 
 
-/**
- * Tests if a Polygon shape is convex
- *
- * @return {Boolean} true is a convex shape
- */
-TRAIL.Polygon.prototype.isConvex = function()
-{
-	var vertices = TRAIL.verticesFromPolygon(this);
-	return PolyK.IsConvex(vertices);
-}
 
-
-/**
- * Triangulates a Polygon
- *
- * @return {Array} returns an array of Polygons
- */
-TRAIL.Polygon.prototype.triangulate = function()
-{
-	// block triangulation if not simple
-    if(this.isSimple() == true)
-	{
-		var vertices = TRAIL.verticesFromPolygon(this);
-		var polykReturnValues = PolyK.Triangulate(vertices);
-
-		// iterate over triangle data, creating polys for use
-		var triangles = [];
-		for (var i = 0; i < polykReturnValues.length; i += 3)
-		{
-			var polygon = new TRAIL.Polygon([
-				this.vertices[polykReturnValues[i]].x, this.vertices[polykReturnValues[i]].y,
-				this.vertices[polykReturnValues[i + 1]].x, this.vertices[polykReturnValues[i + 1]].y,
-				this.vertices[polykReturnValues[i + 2]].x, this.vertices[polykReturnValues[i + 2]].y
-			]);
-			triangles.push(polygon);
-		}
-
-		return triangles;
-	} else
-	{
-		return [];
-	}
-}
 
 
 // constructor
